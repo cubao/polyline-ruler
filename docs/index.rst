@@ -1,4 +1,4 @@
-pybind11_rdp Documentation
+polyline_ruler Documentation
 ============================
 
 Contents:
@@ -6,4 +6,4 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   pybind11_rdp
+   polyline_ruler
