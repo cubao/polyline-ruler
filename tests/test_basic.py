@@ -1,4 +1,4 @@
-from pybind11_rdp import LineSegment, rdp
+from polyline_ruler import LineSegment, rdp
 
 
 def test_segment():

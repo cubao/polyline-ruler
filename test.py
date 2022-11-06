@@ -1,9 +1,9 @@
 import time
 
 import numpy as np
-from pybind11_rdp import LineSegment
-from pybind11_rdp import rdp as rdp_pybind
-from pybind11_rdp import rdp_mask as rdp_mask
+from polyline_ruler import LineSegment
+from polyline_ruler import rdp as rdp_pybind
+from polyline_ruler import rdp_mask as rdp_mask
 from rdp import rdp as rdp_python
 
 seg = LineSegment([0, 0, 0], [10, 0, 0])
