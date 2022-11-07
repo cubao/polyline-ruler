@@ -129,6 +129,34 @@ PYBIND11_MODULE(polyline_ruler, m)
         //
         ;
 
+    py::class_<PolylineRuler>(m, "PolylineRuler", py::module_local()) //
+        .def(py::init<const Eigen::Ref<const RowVectors> &, bool>(),  //
+             "coords"_a, py::kw_only(), "is_wgs84"_a = false)
+        //
+        .def("polyline", &PolylineRuler::polyline, rvp::reference_internal)
+        .def("N", &PolylineRuler::N)
+        .def("is_wgs84", &PolylineRuler::is_wgs84)
+        //
+        .def_static(
+            "_ranges",
+            py::overload_cast<const Eigen::Ref<const RowVectors> &, bool>(
+                &PolylineRuler::ranges),
+            "polyline"_a, py::kw_only(), "is_wgs84"_a = false)
+        .def("ranges", py::overload_cast<>(&PolylineRuler::ranges, py::const_),
+             rvp::reference_internal)
+        //
+        .def("length", &PolylineRuler::length)
+        //
+        .def_static(
+            "_dirs",
+            py::overload_cast<const Eigen::Ref<const RowVectors> &, bool>(
+                &PolylineRuler::dirs),
+            "polyline"_a, py::kw_only(), "is_wgs84"_a = false)
+        .def("dirs", py::overload_cast<>(&PolylineRuler::dirs, py::const_),
+             rvp::reference_internal)
+        //
+        ;
+
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else
