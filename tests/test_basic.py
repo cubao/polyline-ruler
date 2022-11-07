@@ -1,7 +1,7 @@
 import time
 
 import numpy as np
-from polyline_ruler import LineSegment, tf
+from polyline_ruler import LineSegment, intersect_segments, tf
 
 
 def test_segment():
@@ -63,3 +63,24 @@ def test_transform_cheap_ruler():
         print(t1.interval, t2.interval, t2.interval / t1.interval)
         delta = np.abs(enus1 - enus2).max()
         print("delta", delta)
+
+
+def test_intersections():
+    pt, t, s = intersect_segments([-1, 0], [1, 0], [0, -1], [0, 1])
+    assert np.all(pt == [0, 0])
+    assert t == 0.5
+    assert s == 0.5
+    pt, t, s = intersect_segments([-1, 0], [1, 0], [0, -1], [0, 3])
+    assert np.all(pt == [0, 0])
+    assert t == 0.5
+    assert s == 0.25
+
+    pt, t, s = intersect_segments([-1, 0, 0], [1, 0, 20], [0, -1, -100], [0, 3, 300])
+    assert np.all(pt == [0, 0, 5.0])
+    assert t == 0.5
+    assert s == 0.25
+
+    seg1 = LineSegment([-1, 0, 0], [1, 0, 20])
+    seg2 = LineSegment([0, -1, -100], [0, 3, 300])
+    pt2, t2, s2 = seg1.intersects(seg2)
+    assert np.all(pt == pt2) and t == t2 and s == s2

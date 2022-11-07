@@ -103,11 +103,29 @@ PYBIND11_MODULE(polyline_ruler, m)
         //
         ;
 
+    m
+        //
+        .def(
+            "intersect_segments",
+            py::overload_cast<const Eigen::Vector2d &, const Eigen::Vector2d &,
+                              const Eigen::Vector2d &, const Eigen::Vector2d &>(
+                &intersect_segments), //
+            "a1"_a, "a2"_a, "b1"_a, "b2"_a)
+        .def(
+            "intersect_segments",
+            py::overload_cast<const Eigen::Vector3d &, const Eigen::Vector3d &,
+                              const Eigen::Vector3d &, const Eigen::Vector3d &>(
+                &intersect_segments), //
+            "a1"_a, "a2"_a, "b1"_a, "b2"_a)
+        //
+        ;
+
     py::class_<LineSegment>(m, "LineSegment", py::module_local())      //
         .def(py::init<const Eigen::Vector3d, const Eigen::Vector3d>(), //
              "A"_a, "B"_a)
         .def("distance", &LineSegment::distance, "P"_a)
         .def("distance2", &LineSegment::distance2, "P"_a)
+        .def("intersects", &LineSegment::intersects, "other"_a)
         //
         ;
 
