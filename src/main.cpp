@@ -202,6 +202,49 @@ PYBIND11_MODULE(polyline_ruler, m)
              py::overload_cast<double>(&PolylineRuler::along, py::const_),
              "dist"_a)
         //
+        .def_static(
+            "_pointToSegmentDistance",
+            py::overload_cast<const Eigen::Vector3d &, const Eigen::Vector3d &,
+                              const Eigen::Vector3d &, bool>(
+                &PolylineRuler::pointToSegmentDistance),
+            "P"_a, "A"_a, "B"_a, py::kw_only(), "is_wgs84"_a = false)
+        .def_static("_pointOnLine",
+                    py::overload_cast<const Eigen::Ref<const RowVectors> &,
+                                      const Eigen::Vector3d &, bool>(
+                        &PolylineRuler::pointOnLine),
+                    "line"_a, "P"_a, py::kw_only(), "is_wgs84"_a = false)
+        .def("pointOnLine",
+             py::overload_cast<const Eigen::Vector3d &>(
+                 &PolylineRuler::pointOnLine, py::const_),
+             "P"_a)
+        .def_static(
+            "_lineSlice",
+            py::overload_cast<const Eigen::Vector3d &, const Eigen::Vector3d &,
+                              const Eigen::Ref<const RowVectors> &, bool>(
+                &PolylineRuler::lineSlice),
+            "start"_a, "stop"_a, "line"_a, //
+            py::kw_only(), "is_wgs84"_a = false)
+        .def(
+            "lineSlice",
+            py::overload_cast<const Eigen::Vector3d &, const Eigen::Vector3d &>(
+                &PolylineRuler::lineSlice, py::const_),
+            //
+            "start"_a, "stop"_a)
+        //
+        .def_static(
+            "_lineSliceAlong",
+            py::overload_cast<double, double,
+                              const Eigen::Ref<const RowVectors> &, bool>(
+                &PolylineRuler::lineSliceAlong),
+            "start"_a, "stop"_a, "line"_a, //
+            py::kw_only(), "is_wgs84"_a = false)
+        .def("lineSliceAlong",
+             py::overload_cast<double, double>(&PolylineRuler::lineSliceAlong,
+                                               py::const_),
+             "start"_a, "stop"_a)
+        .def_static("_interpolate", &PolylineRuler::interpolate, //
+                    "A"_a, "B"_a, py::kw_only(), "t"_a, "is_wgs84"_a = false)
+        //
         ;
 
 #ifdef VERSION_INFO
