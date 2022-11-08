@@ -174,6 +174,34 @@ PYBIND11_MODULE(polyline_ruler, m)
         .def("scanline", &PolylineRuler::scanline, "range"_a, //
              py::kw_only(), "min"_a, "max"_a, "smooth_joint"_a = true)
         //
+        .def("local_frame", &PolylineRuler::local_frame, "range"_a,
+             py::kw_only(), "smooth_joint"_a = true)
+        //
+        .def_static(
+            "_squareDistance",
+            py::overload_cast<const Eigen::Vector3d &, const Eigen::Vector3d &,
+                              bool>(&PolylineRuler::squareDistance),
+            "a"_a, "b"_a, py::kw_only(), "is_wgs84"_a = false)
+        .def_static(
+            "_distance",
+            py::overload_cast<const Eigen::Vector3d &, const Eigen::Vector3d &,
+                              bool>(&PolylineRuler::distance),
+            "a"_a, "b"_a, py::kw_only(), "is_wgs84"_a = false)
+        .def_static(
+            "_lineDistance",
+            py::overload_cast<const Eigen::Ref<const RowVectors> &, bool>(
+                &PolylineRuler::lineDistance),
+            "line"_a, py::kw_only(), "is_wgs84"_a = false)
+        .def("lineDistance",
+             py::overload_cast<>(&PolylineRuler::lineDistance, py::const_))
+        .def_static("_along",
+                    py::overload_cast<const Eigen::Ref<const RowVectors> &,
+                                      double, bool>(&PolylineRuler::along),
+                    "line"_a, "dist"_a, py::kw_only(), "is_wgs84"_a = false)
+        .def("along",
+             py::overload_cast<double>(&PolylineRuler::along, py::const_),
+             "dist"_a)
+        //
         ;
 
 #ifdef VERSION_INFO
