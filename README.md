@@ -27,10 +27,10 @@ pip install git+https://github.com/cubao/polyline-ruler.git
 
 ## Usage
 
-TODO
+See [`tests/test_basic.py`](tests/test_basic.py).
 
 ## Tests
 
 ```
-python3 test.py
+python3 tests/test_basic.py
 ```

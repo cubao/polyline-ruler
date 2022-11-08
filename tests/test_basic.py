@@ -109,3 +109,29 @@ def test_polyline():
     assert np.all(ruler.along(111.0) == [100, 10, 0])
     assert np.all(ruler.extended_along(-1.0) == [-1, 0, 0])
     assert np.all(ruler.extended_along(111.0) == [101, 10, 0])
+
+    dirs = ruler.dirs()
+    assert dirs.shape == (3, 3)
+    assert np.all(dirs == [[1, 0, 0], [0, 1, 0], [1, 0, 0]])
+
+    dir1 = ruler.dir(10)
+    np.testing.assert_allclose(dir1, [np.sqrt(1 / 2), np.sqrt(1 / 2), 0.0], atol=1e-9)
+    dir2 = ruler.dir(10, smooth_joint=False)
+    assert np.all(dir2 == [1, 0, 0])
+
+    xyz, dir = ruler.arrow(10.0, smooth_joint=False)
+    assert np.all(xyz == [10, 0, 0])
+    assert np.all(dir == dir2)
+    xyz, dir = ruler.arrow(-1.0)
+    assert np.all(xyz == [-1, 0, 0])
+    assert np.all(dir == [1, 0, 0])
+    xyz, dir = ruler.arrow(111)
+    assert np.all(xyz == [101, 10, 0])
+    assert np.all(dir == [1, 0, 0])
+
+    ranges, xyzs, dirs = ruler.arrows([-1, 10, 111])
+    assert len(ranges) == len(xyzs) == len(dirs)
+    ranges, xyzs, dirs = ruler.arrows(10.0)
+    assert len(ranges) == 12 and ranges[-1] == 110
+    ranges, xyzs, dirs = ruler.arrows(10.0 - 1e-9)
+    assert len(ranges) == 13 and ranges[-1] == 110
