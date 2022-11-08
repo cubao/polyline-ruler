@@ -247,6 +247,28 @@ PYBIND11_MODULE(polyline_ruler, m)
         //
         ;
 
+    m //
+        .def(
+            "cheap_ruler_k",
+            [](double lat) -> Eigen::Vector3d { return CheapRuler::k(lat); },
+            "latitude"_a)
+        .def("douglas_simplify_mask", &douglas_simplify_mask, //
+             "coords"_a,                                      //
+             py::kw_only(),                                   //
+             "epsilon"_a, "is_wgs84"_a = false)
+        .def("douglas_simplify_indexes", &douglas_simplify_indexes, //
+             "coords"_a,                                            //
+             py::kw_only(),                                         //
+             "epsilon"_a, "is_wgs84"_a = false)
+        .def("douglas_simplify",
+             py::overload_cast<const Eigen::Ref<const RowVectors> &, double,
+                               bool>(&douglas_simplify), //
+             "coords"_a,                                 //
+             py::kw_only(),                              //
+             "epsilon"_a, "is_wgs84"_a = false)
+        //
+        ;
+
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else
