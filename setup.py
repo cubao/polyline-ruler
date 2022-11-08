@@ -126,7 +126,7 @@ setup(
     author="tzx",
     author_email="dvorak4tzx@gmail.com",
     url="https://github.com/cubao/polyline-ruler",
-    description="polyline ruler, more than cheap-ruler",
+    description="cubao/polyline-ruler is more than mapbox/cheap-ruler",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     ext_modules=[CMakeExtension("polyline_ruler")],

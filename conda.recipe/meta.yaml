@@ -35,5 +35,5 @@ test:
     - python -m pytest
 
 about:
-  summary: C++/pybind11/NumPy implementation of the Ramer-Douglas-Peucker algorithm (Ramer 1972; Douglas and Peucker 1973) for 2D and 3D data.
+  summary: cubao/polyline-ruler is more than mapbox/cheap-ruler
   license_file: LICENSE

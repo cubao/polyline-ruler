@@ -37,8 +37,7 @@ python_sdist:
 	$(PYTHON) setup.py sdist
 	# tar -tvf dist/polyline_ruler-*.tar.gz
 python_test:
-	$(PYTHON) -c 'from polyline_ruler import rdp; print(rdp([[1, 1], [2, 2], [3, 3], [4, 4]]))'
-	$(PYTHON) test.py
+	$(PYTHON) -m pytest tests/test_basic.py --capture tee-sys -vv -x
 
 # conda create -y -n py36 python=3.6
 # conda create -y -n py37 python=3.7
