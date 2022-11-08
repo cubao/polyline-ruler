@@ -84,3 +84,11 @@ def test_intersections():
     seg2 = LineSegment([0, -1, -100], [0, 3, 300])
     pt2, t2, s2 = seg1.intersects(seg2)
     assert np.all(pt == pt2) and t == t2 and s == s2
+
+
+from pybind11_rdp import LineSegment as LineSegment2
+
+seg1 = LineSegment([-1, 0, 0], [1, 0, 20])
+seg2 = LineSegment2([0, -1, -100], [0, 3, 300])
+pt2, t2, s2 = seg1.intersects(seg2)
+print()

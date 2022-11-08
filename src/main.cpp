@@ -155,6 +155,25 @@ PYBIND11_MODULE(polyline_ruler, m)
         .def("dirs", py::overload_cast<>(&PolylineRuler::dirs, py::const_),
              rvp::reference_internal)
         //
+        .def("dir",
+             py::overload_cast<double, bool>(&PolylineRuler::dir, py::const_),
+             "range"_a, py::kw_only(), "smooth_joint"_a = true)
+        .def("extented_along", &PolylineRuler::extended_along, "range"_a)
+        .def("arrow", &PolylineRuler::arrow, "range"_a, //
+             py::kw_only(), "smooth_joint"_a = true)
+        .def("arrows",
+             py::overload_cast<const Eigen::Ref<const Eigen::VectorXd> &, bool>(
+                 &PolylineRuler::arrows, py::const_),
+             "ranges"_a, //
+             py::kw_only(), "smooth_joint"_a = true)
+        .def("arrows",
+             py::overload_cast<double, bool, bool>(&PolylineRuler::arrows,
+                                                   py::const_),
+             "step"_a, //
+             py::kw_only(), "with_last"_a = true, "smooth_joint"_a = true)
+        .def("scanline", &PolylineRuler::scanline, "range"_a, //
+             py::kw_only(), "min"_a, "max"_a, "smooth_joint"_a = true)
+        //
         ;
 
 #ifdef VERSION_INFO
