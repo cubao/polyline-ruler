@@ -1,7 +1,13 @@
 import time
 
 import numpy as np
-from polyline_ruler import LineSegment, intersect_segments, tf
+from polyline_ruler import (
+    LineSegment,
+    PolylineRuler,
+    cheap_ruler_k,
+    intersect_segments,
+    tf,
+)
 
 
 def test_segment():
@@ -86,9 +92,20 @@ def test_intersections():
     assert np.all(pt == pt2) and t == t2 and s == s2
 
 
-from pybind11_rdp import LineSegment as LineSegment2
+def test_polyline():
+    ruler = PolylineRuler([[0, 0, 0], [10, 0, 0], [10, 10, 0], [100, 10, 0]])
+    assert np.all(ruler.ranges() == [0, 10, 20, 110])
+    assert ruler.length() == 110.0
 
-seg1 = LineSegment([-1, 0, 0], [1, 0, 20])
-seg2 = LineSegment2([0, -1, -100], [0, 3, 300])
-pt2, t2, s2 = seg1.intersects(seg2)
-print()
+    for along in [ruler.along, ruler.extended_along]:
+        assert np.all(along(0.0) == [0, 0, 0])
+        assert np.all(along(10.0) == [10, 0, 0])
+        assert np.all(along(18.0) == [10, 8, 0])
+        assert np.all(along(21.0) == [11, 10, 0])
+        assert np.all(along(100.0) == [90, 10, 0])
+        assert np.all(along(110.0) == [100, 10, 0])
+
+    assert np.all(ruler.along(-1.0) == [0, 0, 0])
+    assert np.all(ruler.along(111.0) == [100, 10, 0])
+    assert np.all(ruler.extended_along(-1.0) == [-1, 0, 0])
+    assert np.all(ruler.extended_along(111.0) == [101, 10, 0])

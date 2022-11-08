@@ -158,7 +158,7 @@ PYBIND11_MODULE(polyline_ruler, m)
         .def("dir",
              py::overload_cast<double, bool>(&PolylineRuler::dir, py::const_),
              "range"_a, py::kw_only(), "smooth_joint"_a = true)
-        .def("extented_along", &PolylineRuler::extended_along, "range"_a)
+        .def("extended_along", &PolylineRuler::extended_along, "range"_a)
         .def("arrow", &PolylineRuler::arrow, "range"_a, //
              py::kw_only(), "smooth_joint"_a = true)
         .def("arrows",
