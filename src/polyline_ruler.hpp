@@ -36,6 +36,104 @@ intersect_segments(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2,
     double s2_y = b2[1] - b1[1];
     double div = s1_x * s2_y - s2_x * s1_y;
     if (div == 0.0) {
+        // s1.x/s1.y == s2.x/s2.y => parallel
+        // this may be trivial, but we try to handle it properly
+        // a1 o--------o a2
+        //      b1  o--------o b2
+        double b1a2x = a2[0] - b1[0];
+        double b1a2y = a2[1] - b1[1];
+        // dot(vec(b1->a2), rot90(vec(a1->a2)))
+        double dot = -s1_y * b1a2x + s1_x * b1a2y;
+        if (dot != 0.0) {
+            return {};
+        }
+        // four points on one line
+        double dx = s1_x;
+        double dy = s1_y;
+        if (dx == 0.0 && dy == 0.0) {
+            dx = s2_x;
+            dy = s2_y;
+        }
+        if (dx == 0.0 && dy == 0.0) {
+            if (a1 != b1) {
+                return {};
+            }
+            return std::make_tuple(a1, 0.0, 0.0);
+        }
+        Eigen::Vector2d dir(dx, dy);
+        double v_a1 = 0.0;
+        double v_a2 = (a2 - a1).dot(dir);
+        double v_b1 = (b1 - a1).dot(dir);
+        double v_b2 = (b2 - a1).dot(dir);
+        // 1) disjoint
+        //      a1 o----o a2 - - - - b1 o-----o b2
+        //      b1 o----o b2 - - - - a1 o-----o a2
+        if (std::min(v_b1, v_b2) > std::max(v_a1, v_a2) ||
+            std::max(v_b1, v_b2) < std::min(v_a1, v_a2)) {
+            return {};
+        }
+        double aL = std::min(v_a1, v_a2);
+        double aR = std::max(v_a1, v_a2);
+        double bL = std::min(v_b1, v_b2);
+        double bR = std::max(v_b1, v_b2);
+        // 2) A includes B
+        //      a1 o-----+---+--------o a2
+        //               |   |
+        //           b1  o---o b2
+        if (aL <= bL && bR <= aR) {
+            double t = ((v_b1 + v_b2) / 2.0 - aL) / (aR - aL);
+            if (v_a2 < v_a1) {
+                t = 1.0 - t;
+            }
+            return std::make_tuple(Eigen::Vector2d((b1 + b2) / 2.0), t, 0.5);
+        }
+        // 3) B includes A
+        //           a1  o---o a2
+        //               |   |
+        //      b1 o-----+---+--------o b2
+        if (bL <= aL && aR <= bR) {
+            double t = ((v_a1 + v_a2) / 2.0 - bL) / (bR - bL);
+            if (v_b2 < v_b1) {
+                t = 1.0 - t;
+            }
+            return std::make_tuple(Eigen::Vector2d((a1 + a2) / 2.0), 0.5, t);
+        }
+        // 4) A partially overlaps B, A at left
+        //      a1 o-----+--o a2
+        //               |  |
+        //           b1  o--+-----o b2
+        if (aL <= bL && bL <= aR && aR <= bR) {
+            double c = (aR + bL) / 2.0;
+            double t = (c - aL) / (aR - aL);
+            if (v_a2 < v_a1) {
+                t = 1.0 - t;
+            }
+            double s = (c - bL) / (bR - bL);
+            if (v_b2 < v_b1) {
+                s = 1.0 - s;
+            }
+            Eigen::Vector2d P =
+                ((v_a1 <= v_a2 ? a2 : a1) + (v_b1 <= v_b2 ? b1 : b2)) / 2.0;
+            return std::make_tuple(P, t, s);
+        }
+        // 5) A partially overlaps B, B at left
+        //           a1  o--+-----o a2
+        //               |  |
+        //      b1 o-----+--o b2
+        if (bL <= aL && aL <= bR && bR <= aR) {
+            double c = (aL + bR) / 2.0;
+            double t = (c - aL) / (aR - aL);
+            if (v_a2 < v_a1) {
+                t = 1.0 - t;
+            }
+            double s = (c - bL) / (bR - bL);
+            if (v_b2 < v_b1) {
+                s = 1.0 - s;
+            }
+            Eigen::Vector2d P =
+                ((v_a1 <= v_a2 ? a1 : a2) + (v_b1 <= v_b2 ? b2 : b1)) / 2.0;
+            return std::make_tuple(P, t, s);
+        }
         return {};
     }
     double inv = 1.0 / div;

@@ -93,7 +93,10 @@ def test_intersections():
 
 
 def test_intersections_parallel():
-    pass
+    P, t, s = intersect_segments([-9, 0], [1, 0], [-1, 0], [9, 0])
+    assert np.all(P == [0, 0])
+    assert t == 0.9
+    assert s == 0.1
 
 
 def test_cheap_ruler_k():
