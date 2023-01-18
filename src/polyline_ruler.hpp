@@ -7,7 +7,7 @@
 #endif
 
 #include <Eigen/Core>
-#include "tl/optional.hpp"
+#include <optional>
 
 #include "cheap_ruler.hpp"
 #include "crs_transform.hpp"
@@ -24,7 +24,7 @@ using RowVectorsNx2 = Eigen::Matrix<double, Eigen::Dynamic, 2, Eigen::RowMajor>;
 // https://coliru.stacked-crooked.com/a/624e6e0eabc8a103
 // returns [[x, y], t, s]
 // Note that: won't handle seg1 == seg2
-inline tl::optional<std::tuple<Eigen::Vector2d, double, double>>
+inline std::optional<std::tuple<Eigen::Vector2d, double, double>>
 intersect_segments(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2,
                    const Eigen::Vector2d &b1, const Eigen::Vector2d &b2)
 {
@@ -51,7 +51,7 @@ intersect_segments(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2,
         Eigen::Vector2d(p0_x + (t * s1_x), p0_y + (t * s1_y)), t, s);
 }
 
-inline tl::optional<std::tuple<Eigen::Vector3d, double, double>>
+inline std::optional<std::tuple<Eigen::Vector3d, double, double>>
 intersect_segments(const Eigen::Vector3d &a1, const Eigen::Vector3d &a2,
                    const Eigen::Vector3d &b1, const Eigen::Vector3d &b2)
 {
@@ -99,7 +99,7 @@ struct LineSegment
         return std::sqrt(distance2(P));
     }
 
-    tl::optional<std::tuple<Eigen::Vector3d, double, double>>
+    std::optional<std::tuple<Eigen::Vector3d, double, double>>
     intersects(const LineSegment &other)
     {
         return intersect_segments(A, B, other.A, other.B);
@@ -132,8 +132,8 @@ struct PolylineRuler
     const bool is_wgs84_;
     const Eigen::Vector3d k_;
     // cache
-    mutable tl::optional<Eigen::VectorXd> ranges_;
-    mutable tl::optional<RowVectors> dirs_;
+    mutable std::optional<Eigen::VectorXd> ranges_;
+    mutable std::optional<RowVectors> dirs_;
 
   public:
     const RowVectors &polyline() const { return polyline_; }

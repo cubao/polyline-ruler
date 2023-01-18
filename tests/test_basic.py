@@ -92,7 +92,17 @@ def test_intersections():
     assert np.all(pt == pt2) and t == t2 and s == s2
 
 
-def test_polyline():
+def test_intersections_parallel():
+    pass
+
+
+def test_cheap_ruler_k():
+    k = cheap_ruler_k(50.0)
+    eps = np.abs(k - [71695.753616003, 111229.06398856241, 1.0]).sum()
+    assert eps < 1e-15
+
+
+def test_polyline_ruler():
     ruler = PolylineRuler([[0, 0, 0], [10, 0, 0], [10, 10, 0], [100, 10, 0]])
     assert np.all(ruler.ranges() == [0, 10, 20, 110])
     assert ruler.length() == 110.0

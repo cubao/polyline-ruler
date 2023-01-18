@@ -8,11 +8,11 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include "tl/optional.hpp"
-#include "cheap_ruler.hpp"
+#include <optional>
 
 namespace cubao
 {
+
 namespace internal
 {
 // https://github.com/planet36/ecef-geodetic/blob/main/ecef-to-geodetic-funcs.hpp#L3649-L3735
@@ -198,9 +198,23 @@ inline void apply_transform_inplace(const Eigen::Matrix4d &T,
     }
 }
 
+inline Eigen::Vector3d cheap_ruler_k(double latitude)
+{
+    // based on https://github.com/mapbox/cheap-ruler-cpp
+    static constexpr double RE = 6378.137;
+    static constexpr double FE = 1.0 / 298.257223563;
+    static constexpr double E2 = FE * (2 - FE);
+    static constexpr double RAD = M_PI / 180.0;
+    static constexpr double MUL = RAD * RE * 1000.;
+    double coslat = std::cos(latitude * RAD);
+    double w2 = 1 / (1 - E2 * (1 - coslat * coslat));
+    double w = std::sqrt(w2);
+    return Eigen::Vector3d(MUL * w * coslat, MUL * w * w2 * (1 - E2), 1.0);
+}
+
 using CheapRuler = cheap_ruler::CheapRuler;
 inline RowVectors lla2enu(const Eigen::Ref<const RowVectors> &llas,
-                          tl::optional<Eigen::Vector3d> anchor_lla = {},
+                          std::optional<Eigen::Vector3d> anchor_lla = {},
                           bool cheap_ruler = true)
 {
     if (!llas.rows()) {
@@ -213,7 +227,7 @@ inline RowVectors lla2enu(const Eigen::Ref<const RowVectors> &llas,
         return apply_transform(T_ecef_enu(*anchor_lla).inverse(),
                                lla2ecef(llas));
     }
-    auto k = CheapRuler::k((*anchor_lla)[1], CheapRuler::Unit::Meters);
+    auto k = cheap_ruler_k((*anchor_lla)[1]);
     RowVectors enus = llas;
     for (int i = 0; i < 3; ++i) {
         enus.col(i).array() -= (*anchor_lla)[i];
@@ -231,7 +245,7 @@ inline RowVectors enu2lla(const Eigen::Ref<const RowVectors> &enus,
     if (!cheap_ruler) {
         return ecef2lla(apply_transform(T_ecef_enu(anchor_lla), enus));
     }
-    auto k = CheapRuler::k(anchor_lla[1], CheapRuler::Unit::Meters);
+    auto k = cheap_ruler_k(anchor_lla[1]);
     RowVectors llas = enus;
     for (int i = 0; i < 3; ++i) {
         llas.col(i).array() /= k[i];
@@ -254,7 +268,7 @@ inline RowVectors enu2ecef(const Eigen::Ref<const RowVectors> &enus,
     return apply_transform(T_ecef_enu(anchor_lla).inverse(), enus);
 }
 inline RowVectors ecef2enu(const Eigen::Ref<const RowVectors> &ecef,
-                           tl::optional<Eigen::Vector3d> anchor_lla = {},
+                           std::optional<Eigen::Vector3d> anchor_lla = {},
                            bool cheap_ruler = false)
 {
     if (!ecef.rows()) {

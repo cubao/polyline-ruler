@@ -22,8 +22,8 @@ endif()
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/headers/include)
 
-set(CMAKE_CXX_STANDARD 14)
-set(PYBIND11_CPP_STANDARD -std=c++14)
+set(CMAKE_CXX_STANDARD 17)
+set(PYBIND11_CPP_STANDARD -std=c++17)
 
 add_subdirectory(pybind11)
 pybind11_add_module(polyline_ruler src/main.cpp)

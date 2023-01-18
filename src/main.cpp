@@ -24,31 +24,7 @@ namespace py = pybind11;
 using rvp = py::return_value_policy;
 using namespace pybind11::literals;
 
-namespace pybind11
-{
-namespace detail
-{
-template <typename T>
-struct type_caster<tl::optional<T>> : optional_caster<tl::optional<T>>
-{
-};
-} // namespace detail
-} // namespace pybind11
-
-// clang-format off
-#if (__cplusplus >= 201703L && __has_include(<optional>))
-// C++17, for ubuntu 20.04 gcc9, should `set(CMAKE_CXX_STANDARD 17)` in CMakeLists.txt
-#include <optional>
 #define CUBAO_ARGV_DEFAULT_NONE(argv) py::arg_v(#argv, std::nullopt, "None")
-#elif (__has_include(<experimental/optional>) && !__has_include(<optional>))
-// C++14, for ubuntu 16.04 gcc5
-#include <experimental/optional>
-#define CUBAO_ARGV_DEFAULT_NONE(argv) py::arg_v(#argv, std::experimental::nullopt, "None")
-#else
-// fallback, sadly, explicit None is needed
-#define CUBAO_ARGV_DEFAULT_NONE(argv) #argv##_a
-#endif
-// clang-format on
 
 PYBIND11_MODULE(polyline_ruler, m)
 {
@@ -248,10 +224,7 @@ PYBIND11_MODULE(polyline_ruler, m)
         ;
 
     m //
-        .def(
-            "cheap_ruler_k",
-            [](double lat) -> Eigen::Vector3d { return CheapRuler::k(lat); },
-            "latitude"_a)
+        .def("cheap_ruler_k", &cheap_ruler_k, "latitude"_a)
         .def("douglas_simplify_mask", &douglas_simplify_mask, //
              "coords"_a,                                      //
              py::kw_only(),                                   //
