@@ -71,6 +71,27 @@ def test_transform_cheap_ruler():
         print("delta", delta)
 
 
+def test_transform_T():
+    T_ecef_enu = tf.T_ecef_enu(123, 45, 6.7)
+    R_ecef_enu = tf.R_ecef_enu(123, 45)
+    assert np.all(T_ecef_enu[:3, :3] == R_ecef_enu)
+    assert np.all(T_ecef_enu[:3, 3] == tf.lla2ecef(123, 45, 6.7))
+    T_ecef_enu2 = tf.T_ecef_enu([123, 45, 6.7])
+    assert np.all(T_ecef_enu == T_ecef_enu2)
+
+    enus = np.random.random((100, 3))
+    copy = np.copy(enus)
+    ecefs = tf.apply_transform(T_ecef_enu, enus)
+    assert np.all(enus == copy)
+    tf.apply_transform_inplace(T_ecef_enu, enus)
+    assert np.all(enus != copy)
+    assert np.all(enus == ecefs)
+
+    # python version
+    ecefs2 = (T_ecef_enu[:3, :3] @ copy.T + T_ecef_enu[:3, 3][:, np.newaxis]).T
+    assert np.all(ecefs == ecefs2)
+
+
 def test_intersections():
     pt, t, s = intersect_segments([-1, 0], [1, 0], [0, -1], [0, 1])
     assert np.all(pt == [0, 0])
