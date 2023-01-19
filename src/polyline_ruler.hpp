@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CUBAO_POLYLINE_RULER_HPP
+#define CUBAO_POLYLINE_RULER_HPP
 
 // https://github.com/microsoft/vscode-cpptools/issues/9692
 #if __INTELLISENSE__
@@ -748,3 +749,5 @@ inline RowVectors douglas_simplify(const Eigen::Ref<const RowVectors> &coords,
 }
 
 } // namespace cubao
+
+#endif

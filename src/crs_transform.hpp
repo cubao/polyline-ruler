@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CUBAO_CRS_TRANSFORM_HPP
+#define CUBAO_CRS_TRANSFORM_HPP
 
 // https://github.com/microsoft/vscode-cpptools/issues/9692
 #if __INTELLISENSE__
@@ -285,3 +286,5 @@ inline RowVectors ecef2enu(const Eigen::Ref<const RowVectors> &ecef,
 }
 
 } // namespace cubao
+
+#endif
