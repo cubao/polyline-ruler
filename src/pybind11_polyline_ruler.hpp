@@ -38,7 +38,29 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
         .def("distance", &LineSegment::distance, "P"_a)
         .def("distance2", &LineSegment::distance2, "P"_a)
         .def("intersects", &LineSegment::intersects, "other"_a)
-        // TODO, export len, len2
+        .def_property_readonly(
+            "length",
+            [](const LineSegment &self) { return std::sqrt(self.len2); })
+        .def_property_readonly(
+            "length2", [](const LineSegment &self) { return self.len2; })
+        .def_property_readonly(
+            "A",
+            [](const LineSegment &self) -> const Eigen::Vector3d & {
+                return self.A;
+            },
+            rvp::reference_internal)
+        .def_property_readonly(
+            "B",
+            [](const LineSegment &self) -> const Eigen::Vector3d & {
+                return self.B;
+            },
+            rvp::reference_internal)
+        .def_property_readonly(
+            "AB",
+            [](const LineSegment &self) -> const Eigen::Vector3d & {
+                return self.AB;
+            },
+            rvp::reference_internal)
         //
         ;
 

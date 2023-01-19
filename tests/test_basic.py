@@ -10,6 +10,13 @@ def test_segment():
     assert 4.0 == seg.distance([5.0, 4.0, 0.0])
     assert 5.0 == seg.distance([-4.0, 3.0, 0.0])
     assert 5.0 == seg.distance([14.0, 3.0, 0.0])
+
+    assert np.all(seg.A == [0, 0, 0])
+    assert np.all(seg.B == [10, 0, 0])
+    assert np.all(seg.AB == [10, 0, 0])
+    assert seg.length == 10.0
+    assert seg.length2 == 100.0
+
     seg = LineSegment([0, 0, 0], [0, 0, 0])
     assert 5.0 == seg.distance([3.0, 4.0, 0.0])
     assert 5.0 == seg.distance([-4.0, 3.0, 0.0])
