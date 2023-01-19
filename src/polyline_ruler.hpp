@@ -154,7 +154,8 @@ intersect_segments(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2,
         Eigen::Vector2d(p0_x + (t * s1_x), p0_y + (t * s1_y)), t, s);
 }
 
-inline std::optional<std::tuple<Eigen::Vector3d, double, double>>
+// return center point, t, s, half_span
+inline std::optional<std::tuple<Eigen::Vector3d, double, double, double>>
 intersect_segments(const Eigen::Vector3d &a1, const Eigen::Vector3d &a2,
                    const Eigen::Vector3d &b1, const Eigen::Vector3d &b2)
 {
@@ -171,7 +172,8 @@ intersect_segments(const Eigen::Vector3d &a1, const Eigen::Vector3d &a2,
     double ha = a1[2] * (1.0 - t) + a2[2] * t;
     double hb = b1[2] * (1.0 - s) + b2[2] * s;
     const Eigen::Vector2d &p = std::get<0>(*ret);
-    return std::make_tuple(Eigen::Vector3d(p[0], p[1], (ha + hb) / 2.0), t, s);
+    return std::make_tuple(Eigen::Vector3d(p[0], p[1], (ha + hb) / 2.0), t, s,
+                           (hb - ha) / 2.0);
 }
 
 // https://github.com/cubao/pybind11-rdp/blob/master/src/main.cpp
@@ -202,7 +204,7 @@ struct LineSegment
         return std::sqrt(distance2(P));
     }
 
-    std::optional<std::tuple<Eigen::Vector3d, double, double>>
+    std::optional<std::tuple<Eigen::Vector3d, double, double, double>>
     intersects(const LineSegment &other)
     {
         return intersect_segments(A, B, other.A, other.B);

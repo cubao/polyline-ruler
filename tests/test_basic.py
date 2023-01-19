@@ -81,15 +81,22 @@ def test_intersections():
     assert t == 0.5
     assert s == 0.25
 
-    pt, t, s = intersect_segments([-1, 0, 0], [1, 0, 20], [0, -1, -100], [0, 3, 300])
+    pt, t, s, _ = intersect_segments([-1, 0, 0], [1, 0, 20], [0, -1, -100], [0, 3, 300])
     assert np.all(pt == [0, 0, 5.0])
     assert t == 0.5
     assert s == 0.25
 
     seg1 = LineSegment([-1, 0, 0], [1, 0, 20])
     seg2 = LineSegment([0, -1, -100], [0, 3, 300])
-    pt2, t2, s2 = seg1.intersects(seg2)
+    pt2, t2, s2, _ = seg1.intersects(seg2)
     assert np.all(pt == pt2) and t == t2 and s == s2
+
+    A = [[-1, 0, 10], [1, 0, 10]]
+    B = [[0, -1, 20], [0, 1, 20]]
+    pt, t, s, half_span = LineSegment(*A).intersects(LineSegment(*B))
+    assert np.all(pt == [0, 0, 15]) and t == 0.5 and s == 0.5 and half_span == 5.0
+    pt, t, s, half_span = LineSegment(*B).intersects(LineSegment(*A))
+    assert np.all(pt == [0, 0, 15]) and t == 0.5 and s == 0.5 and half_span == -5.0
 
 
 def test_intersections_parallel():
