@@ -1,6 +1,10 @@
 #ifndef CUBAO_CRS_TRANSFORM_HPP
 #define CUBAO_CRS_TRANSFORM_HPP
 
+// should sync
+// - https://github.com/cubao/polyline-ruler/blob/master/src/crs_transform.hpp
+// - https://github.com/cubao/headers/tree/main/include/cubao/crs_transform.hpp
+
 // https://github.com/microsoft/vscode-cpptools/issues/9692
 #if __INTELLISENSE__
 #undef __ARM_NEON

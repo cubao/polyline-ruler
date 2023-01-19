@@ -1,6 +1,10 @@
 #ifndef CUBAO_POLYLINE_RULER_HPP
 #define CUBAO_POLYLINE_RULER_HPP
 
+// should sync
+// - https://github.com/cubao/polyline-ruler/blob/master/src/polyline_ruler.hpp
+// - https://github.com/cubao/headers/tree/main/include/cubao/polyline_ruler.hpp
+
 // https://github.com/microsoft/vscode-cpptools/issues/9692
 #if __INTELLISENSE__
 #undef __ARM_NEON

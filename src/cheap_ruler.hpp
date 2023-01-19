@@ -1,6 +1,10 @@
 #ifndef CUBAO_CHEAP_RULER_HPP
 #define CUBAO_CHEAP_RULER_HPP
 
+// should sync
+// - https://github.com/cubao/polyline-ruler/blob/master/src/cheap_ruler.hpp
+// - https://github.com/cubao/headers/tree/main/include/cubao/cheap_ruler.hpp
+
 // based on https://github.com/mapbox/cheap-ruler-cpp
 
 // https://github.com/microsoft/vscode-cpptools/issues/9692
