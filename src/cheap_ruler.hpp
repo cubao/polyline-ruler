@@ -479,6 +479,8 @@ class CheapRuler
 };
 
 } // namespace cheap_ruler
+
+using CheapRuler = cheap_ruler::CheapRuler;
 } // namespace cubao
 
 #endif

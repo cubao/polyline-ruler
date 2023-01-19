@@ -213,7 +213,6 @@ inline Eigen::Vector3d cheap_ruler_k(double latitude)
     return Eigen::Vector3d(MUL * w * coslat, MUL * w * w2 * (1 - E2), 1.0);
 }
 
-using CheapRuler = cheap_ruler::CheapRuler;
 inline RowVectors lla2enu(const Eigen::Ref<const RowVectors> &llas,
                           std::optional<Eigen::Vector3d> anchor_lla = {},
                           bool cheap_ruler = true)
