@@ -7,9 +7,6 @@
 #include "cubao_inline.hpp"
 #include "crs_transform.hpp"
 
-#include <fstream>
-#include <iostream>
-
 namespace cubao
 {
 namespace py = pybind11;
