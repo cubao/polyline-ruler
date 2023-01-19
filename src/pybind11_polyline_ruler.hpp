@@ -159,6 +159,5 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
                     "A"_a, "B"_a, py::kw_only(), "t"_a, "is_wgs84"_a = false)
         //
         ;
-
 }
 } // namespace cubao

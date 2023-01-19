@@ -50,6 +50,8 @@ CUBAO_INLINE void bind_crs_transform(py::module &m)
         .def("apply_transform_inplace", &apply_transform_inplace, //
              "T"_a, "coords"_a, py::kw_only(), "batch_size"_a = 1000)
         //
+        .def("cheap_ruler_k", &cheap_ruler_k, "latitude"_a)
+        //
         ;
 }
 } // namespace cubao

@@ -19,6 +19,7 @@
 
 #define CUBAO_ARGV_DEFAULT_NONE(argv) py::arg_v(#argv, std::nullopt, "None")
 
+#include "pybind11_cheap_ruler.hpp"
 #include "pybind11_crs_transform.hpp"
 #include "pybind11_polyline_ruler.hpp"
 
@@ -43,29 +44,9 @@ PYBIND11_MODULE(polyline_ruler, m)
            TODO
     )pbdoc";
 
-    using namespace cubao;
-
+    bind_cheap_ruler(m);
     bind_crs_transform(m);
     bind_polyline_ruler(m);
-
-    m //
-        .def("cheap_ruler_k", &cheap_ruler_k, "latitude"_a)
-        .def("douglas_simplify_mask", &douglas_simplify_mask, //
-             "coords"_a,                                      //
-             py::kw_only(),                                   //
-             "epsilon"_a, "is_wgs84"_a = false)
-        .def("douglas_simplify_indexes", &douglas_simplify_indexes, //
-             "coords"_a,                                            //
-             py::kw_only(),                                         //
-             "epsilon"_a, "is_wgs84"_a = false)
-        .def("douglas_simplify",
-             py::overload_cast<const Eigen::Ref<const RowVectors> &, double,
-                               bool>(&douglas_simplify), //
-             "coords"_a,                                 //
-             py::kw_only(),                              //
-             "epsilon"_a, "is_wgs84"_a = false)
-        //
-        ;
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
