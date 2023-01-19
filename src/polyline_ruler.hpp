@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CUBAO_POLYLINE_RULER_HPP
+#define CUBAO_POLYLINE_RULER_HPP
 
 // https://github.com/microsoft/vscode-cpptools/issues/9692
 #if __INTELLISENSE__
@@ -7,7 +8,7 @@
 #endif
 
 #include <Eigen/Core>
-#include "tl/optional.hpp"
+#include <optional>
 
 #include "cheap_ruler.hpp"
 #include "crs_transform.hpp"
@@ -23,8 +24,12 @@ using RowVectorsNx2 = Eigen::Matrix<double, Eigen::Dynamic, 2, Eigen::RowMajor>;
 // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/1968345#1968345
 // https://coliru.stacked-crooked.com/a/624e6e0eabc8a103
 // returns [[x, y], t, s]
-// Note that: won't handle seg1 == seg2
-inline tl::optional<std::tuple<Eigen::Vector2d, double, double>>
+// if segment A, B overlaps, will only return center point (instead of the
+// overlapping segment) e.g.
+//      A o------------x---o
+//                     | center point of overlapping segment
+//      B          o---x------------o
+inline std::optional<std::tuple<Eigen::Vector2d, double, double>>
 intersect_segments(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2,
                    const Eigen::Vector2d &b1, const Eigen::Vector2d &b2)
 {
@@ -36,6 +41,104 @@ intersect_segments(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2,
     double s2_y = b2[1] - b1[1];
     double div = s1_x * s2_y - s2_x * s1_y;
     if (div == 0.0) {
+        // s1.x/s1.y == s2.x/s2.y => parallel
+        // this may be trivial, but we try to handle it properly
+        // a1 o--------o a2
+        //      b1  o--------o b2
+        double b1a2x = a2[0] - b1[0];
+        double b1a2y = a2[1] - b1[1];
+        // dot(vec(b1->a2), rot90(vec(a1->a2)))
+        double dot = -s1_y * b1a2x + s1_x * b1a2y;
+        if (dot != 0.0) {
+            return {};
+        }
+        // four points on one line
+        double dx = s1_x;
+        double dy = s1_y;
+        if (dx == 0.0 && dy == 0.0) {
+            dx = s2_x;
+            dy = s2_y;
+        }
+        if (dx == 0.0 && dy == 0.0) {
+            if (a1 != b1) {
+                return {};
+            }
+            return std::make_tuple(a1, 0.0, 0.0);
+        }
+        Eigen::Vector2d dir(dx, dy);
+        double v_a1 = 0.0;
+        double v_a2 = (a2 - a1).dot(dir);
+        double v_b1 = (b1 - a1).dot(dir);
+        double v_b2 = (b2 - a1).dot(dir);
+        // 1) disjoint
+        //      a1 o----o a2 - - - - b1 o-----o b2
+        //      b1 o----o b2 - - - - a1 o-----o a2
+        if (std::min(v_b1, v_b2) > std::max(v_a1, v_a2) ||
+            std::max(v_b1, v_b2) < std::min(v_a1, v_a2)) {
+            return {};
+        }
+        double aL = std::min(v_a1, v_a2);
+        double aR = std::max(v_a1, v_a2);
+        double bL = std::min(v_b1, v_b2);
+        double bR = std::max(v_b1, v_b2);
+        // 2) A includes B
+        //      a1 o-----+---+--------o a2
+        //               |   |
+        //           b1  o---o b2
+        if (aL <= bL && bR <= aR) {
+            double t = ((v_b1 + v_b2) / 2.0 - aL) / (aR - aL);
+            if (v_a2 < v_a1) {
+                t = 1.0 - t;
+            }
+            return std::make_tuple(Eigen::Vector2d((b1 + b2) / 2.0), t, 0.5);
+        }
+        // 3) B includes A
+        //           a1  o---o a2
+        //               |   |
+        //      b1 o-----+---+--------o b2
+        if (bL <= aL && aR <= bR) {
+            double t = ((v_a1 + v_a2) / 2.0 - bL) / (bR - bL);
+            if (v_b2 < v_b1) {
+                t = 1.0 - t;
+            }
+            return std::make_tuple(Eigen::Vector2d((a1 + a2) / 2.0), 0.5, t);
+        }
+        // 4) A partially overlaps B, A at left
+        //      a1 o-----+--o a2
+        //               |  |
+        //           b1  o--+-----o b2
+        if (aL <= bL && bL <= aR && aR <= bR) {
+            double c = (aR + bL) / 2.0;
+            double t = (c - aL) / (aR - aL);
+            if (v_a2 < v_a1) {
+                t = 1.0 - t;
+            }
+            double s = (c - bL) / (bR - bL);
+            if (v_b2 < v_b1) {
+                s = 1.0 - s;
+            }
+            Eigen::Vector2d P =
+                ((v_a1 <= v_a2 ? a2 : a1) + (v_b1 <= v_b2 ? b1 : b2)) / 2.0;
+            return std::make_tuple(P, t, s);
+        }
+        // 5) A partially overlaps B, B at left
+        //           a1  o--+-----o a2
+        //               |  |
+        //      b1 o-----+--o b2
+        if (bL <= aL && aL <= bR && bR <= aR) {
+            double c = (aL + bR) / 2.0;
+            double t = (c - aL) / (aR - aL);
+            if (v_a2 < v_a1) {
+                t = 1.0 - t;
+            }
+            double s = (c - bL) / (bR - bL);
+            if (v_b2 < v_b1) {
+                s = 1.0 - s;
+            }
+            Eigen::Vector2d P =
+                ((v_a1 <= v_a2 ? a1 : a2) + (v_b1 <= v_b2 ? b2 : b1)) / 2.0;
+            return std::make_tuple(P, t, s);
+        }
         return {};
     }
     double inv = 1.0 / div;
@@ -51,7 +154,8 @@ intersect_segments(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2,
         Eigen::Vector2d(p0_x + (t * s1_x), p0_y + (t * s1_y)), t, s);
 }
 
-inline tl::optional<std::tuple<Eigen::Vector3d, double, double>>
+// return center point, t, s, half_span
+inline std::optional<std::tuple<Eigen::Vector3d, double, double, double>>
 intersect_segments(const Eigen::Vector3d &a1, const Eigen::Vector3d &a2,
                    const Eigen::Vector3d &b1, const Eigen::Vector3d &b2)
 {
@@ -68,7 +172,8 @@ intersect_segments(const Eigen::Vector3d &a1, const Eigen::Vector3d &a2,
     double ha = a1[2] * (1.0 - t) + a2[2] * t;
     double hb = b1[2] * (1.0 - s) + b2[2] * s;
     const Eigen::Vector2d &p = std::get<0>(*ret);
-    return std::make_tuple(Eigen::Vector3d(p[0], p[1], (ha + hb) / 2.0), t, s);
+    return std::make_tuple(Eigen::Vector3d(p[0], p[1], (ha + hb) / 2.0), t, s,
+                           (hb - ha) / 2.0);
 }
 
 // https://github.com/cubao/pybind11-rdp/blob/master/src/main.cpp
@@ -99,7 +204,7 @@ struct LineSegment
         return std::sqrt(distance2(P));
     }
 
-    tl::optional<std::tuple<Eigen::Vector3d, double, double>>
+    std::optional<std::tuple<Eigen::Vector3d, double, double, double>>
     intersects(const LineSegment &other)
     {
         return intersect_segments(A, B, other.A, other.B);
@@ -132,8 +237,8 @@ struct PolylineRuler
     const bool is_wgs84_;
     const Eigen::Vector3d k_;
     // cache
-    mutable tl::optional<Eigen::VectorXd> ranges_;
-    mutable tl::optional<RowVectors> dirs_;
+    mutable std::optional<Eigen::VectorXd> ranges_;
+    mutable std::optional<RowVectors> dirs_;
 
   public:
     const RowVectors &polyline() const { return polyline_; }
@@ -646,3 +751,5 @@ inline RowVectors douglas_simplify(const Eigen::Ref<const RowVectors> &coords,
 }
 
 } // namespace cubao
+
+#endif

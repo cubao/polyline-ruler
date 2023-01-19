@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CUBAO_EIGEN_HELPERS_HPP
+#define CUBAO_EIGEN_HELPERS_HPP
 
 // https://github.com/microsoft/vscode-cpptools/issues/9692
 #if __INTELLISENSE__
@@ -77,3 +78,5 @@ inline RowVectors to_Nx3(const Eigen::Ref<const RowVectorsNx2> &coords)
 }
 
 } // namespace cubao
+
+#endif

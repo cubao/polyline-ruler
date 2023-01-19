@@ -1,5 +1,7 @@
+#ifndef CUBAO_CHEAP_RULER_HPP
+#define CUBAO_CHEAP_RULER_HPP
+
 // based on https://github.com/mapbox/cheap-ruler-cpp
-#pragma once
 
 // https://github.com/microsoft/vscode-cpptools/issues/9692
 #if __INTELLISENSE__
@@ -478,3 +480,5 @@ class CheapRuler
 
 } // namespace cheap_ruler
 } // namespace cubao
+
+#endif
