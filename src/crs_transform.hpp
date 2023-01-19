@@ -1,6 +1,10 @@
 #ifndef CUBAO_CRS_TRANSFORM_HPP
 #define CUBAO_CRS_TRANSFORM_HPP
 
+// should sync
+// - https://github.com/cubao/polyline-ruler/blob/master/src/crs_transform.hpp
+// - https://github.com/cubao/headers/tree/main/include/cubao/crs_transform.hpp
+
 // https://github.com/microsoft/vscode-cpptools/issues/9692
 #if __INTELLISENSE__
 #undef __ARM_NEON
@@ -213,7 +217,6 @@ inline Eigen::Vector3d cheap_ruler_k(double latitude)
     return Eigen::Vector3d(MUL * w * coslat, MUL * w * w2 * (1 - E2), 1.0);
 }
 
-using CheapRuler = cheap_ruler::CheapRuler;
 inline RowVectors lla2enu(const Eigen::Ref<const RowVectors> &llas,
                           std::optional<Eigen::Vector3d> anchor_lla = {},
                           bool cheap_ruler = true)

@@ -19,7 +19,6 @@
 
 #define CUBAO_ARGV_DEFAULT_NONE(argv) py::arg_v(#argv, std::nullopt, "None")
 
-#include "pybind11_cheap_ruler.hpp"
 #include "pybind11_crs_transform.hpp"
 #include "pybind11_polyline_ruler.hpp"
 
@@ -43,8 +42,6 @@ PYBIND11_MODULE(polyline_ruler, m)
 
            TODO
     )pbdoc";
-
-    cubao::bind_cheap_ruler(m);
 
     auto tf = m.def_submodule("tf");
     cubao::bind_crs_transform(tf);
