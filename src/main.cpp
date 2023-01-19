@@ -44,9 +44,12 @@ PYBIND11_MODULE(polyline_ruler, m)
            TODO
     )pbdoc";
 
-    bind_cheap_ruler(m);
-    bind_crs_transform(m);
-    bind_polyline_ruler(m);
+    cubao::bind_cheap_ruler(m);
+
+    auto tf = m.def_submodule("tf");
+    cubao::bind_crs_transform(tf);
+
+    cubao::bind_polyline_ruler(m);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

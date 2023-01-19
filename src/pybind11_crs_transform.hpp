@@ -15,9 +15,9 @@ using rvp = py::return_value_policy;
 
 CUBAO_INLINE void bind_crs_transform(py::module &m)
 {
-    auto tf = m.def_submodule("tf");
-    tf //
-       // ecef <-> lla
+    //
+    m
+        // ecef <-> lla
         .def("ecef2lla", py::overload_cast<double, double, double>(ecef2lla),
              "x"_a, "y"_a, "z"_a)
         .def("ecef2lla",
