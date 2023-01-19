@@ -23,7 +23,11 @@ using RowVectorsNx2 = Eigen::Matrix<double, Eigen::Dynamic, 2, Eigen::RowMajor>;
 // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/1968345#1968345
 // https://coliru.stacked-crooked.com/a/624e6e0eabc8a103
 // returns [[x, y], t, s]
-// Note that: won't handle seg1 == seg2
+// if segment A, B overlaps, will only return center point (instead of the
+// overlapping segment) e.g.
+//      A o------------x---o
+//                     | center point of overlapping segment
+//      B          o---x------------o
 inline std::optional<std::tuple<Eigen::Vector2d, double, double>>
 intersect_segments(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2,
                    const Eigen::Vector2d &b1, const Eigen::Vector2d &b2)

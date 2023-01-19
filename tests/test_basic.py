@@ -93,10 +93,135 @@ def test_intersections():
 
 
 def test_intersections_parallel():
-    P, t, s = intersect_segments([-9, 0], [1, 0], [-1, 0], [9, 0])
+    # o---o
+    #         o----o
+    A = [[-2, 0], [-1, 0]]
+    B = [[1, 0], [2, 0]]
+    ret = intersect_segments(*A, *B)
+    assert ret is None
+    ret = intersect_segments(*B, *A)
+    assert ret is None
+
+    # o----------------------o
+    #                     o----------------------o
+    A = [[-9, 0], [1, 0]]
+    B = [[-1, 0], [9, 0]]
+    P, t, s = intersect_segments(*A, *B)
     assert np.all(P == [0, 0])
     assert t == 0.9
     assert s == 0.1
+    P, t, s = intersect_segments(*B, *A)
+    assert np.all(P == [0, 0])
+    assert t == 0.1
+    assert s == 0.9
+    P, t, s = intersect_segments(*A[::-1], *B)
+    assert np.all(P == [0, 0])
+    assert t == 0.1
+    assert np.abs(s - 0.1) < 1e-15
+    P, t, s = intersect_segments(*A, *B[::-1])
+    assert np.all(P == [0, 0])
+    assert t == 0.9
+    assert s == 0.9
+
+    # parallel
+    A = [[-9, 1], [1, 1]]
+    B = [[-1, 0], [9, 0]]
+    for A_, B_ in [[A, B], [A[::-1], B], [A, B[::-1]]]:
+        ret = intersect_segments(*A_, *B_)
+        assert ret is None
+        ret = intersect_segments(*B_, *A_)
+        assert ret is None
+
+    # o---o
+    #     o----o
+    A = [[-2, 0], [0, 0]]
+    B = [[0, 0], [2, 0]]
+    P, t, s = intersect_segments(*A, *B)
+    assert np.all(P == [0, 0])
+    assert t == 1.0
+    assert s == 0.0
+    P, t, s = intersect_segments(*A[::-1], *B)
+    assert np.all(P == [0, 0])
+    assert t == 0.0
+    assert s == 0.0
+    P, t, s = intersect_segments(*A, *B[::-1])
+    assert np.all(P == [0, 0])
+    assert t == 1.0
+    assert s == 1.0
+    P, t, s = intersect_segments(*A[::-1], *B[::-1])
+    assert np.all(P == [0, 0])
+    assert t == 0.0
+    assert s == 1.0
+    P, t, s = intersect_segments(*B, *A)
+    assert np.all(P == [0, 0])
+    assert t == 0.0
+    assert s == 1.0
+
+    # o-----------o
+    #    o----o
+    A = [[-5, 0], [5, 0]]
+    B = [[-1, 0], [3, 0]]
+    P, t, s = intersect_segments(*A, *B)
+    assert np.all(P == [1, 0])
+    assert t == 0.6
+    assert s == 0.5
+    P, t, s = intersect_segments(*A[::-1], *B)
+    assert np.all(P == [1, 0])
+    assert t == 0.4
+    assert s == 0.5
+    P, t, s = intersect_segments(*A[::-1], *B[::-1])
+    assert np.all(P == [1, 0])
+    assert t == 0.4
+    assert s == 0.5
+    P, t, s = intersect_segments(*A, *B[::-1])
+    assert np.all(P == [1, 0])
+    assert t == 0.6
+    assert s == 0.5
+
+
+def test_intersections_duplicates():
+    A = [[-5, 0], [5, 0]]
+    B = A
+    P, t, s = intersect_segments(*A, *B)
+    assert np.all(P == [0, 0]) and t == 0.5 and s == 0.5
+
+    # A o
+    # B o----o
+    A = [[0, 0], [0, 0]]
+    B = [[0, 0], [1, 0]]
+    P, t, s = intersect_segments(*A, *B)
+    assert np.all(P == [0, 0]) and t in (0.0, 0.5) and s == 0.0
+    P, t, s = intersect_segments(*B, *A)
+    assert np.all(P == [0, 0]) and t == 0.0 and s in (0.0, 0.5)
+    P, t, s = intersect_segments(*A, *B[::-1])
+    assert np.all(P == [0, 0]) and t in (0.0, 0.5) and s == 1.0
+
+    # A         o
+    # B                 o---------o
+    A = [[0, 0], [0, 0]]
+    B = [[1, 0], [2, 0]]
+    ret = intersect_segments(*A, *B)
+    assert ret is None
+
+    # A         o
+    # B    o---------o
+    A = [[0, 0], [0, 0]]
+    B = [[-1, 0], [1, 0]]
+    P, t, s = intersect_segments(*A, *B)
+    assert np.all(P == [0, 0]) and t in (0.0, 0.5) and s == 0.5
+    assert ret is None
+
+    # A         o
+    # B         o
+    A = [[0, 0], [0, 0]]
+    B = [[0, 0], [0, 0]]
+    P, t, s = intersect_segments(*A, *B)
+    assert np.all(P == [0, 0]) and t in (0.5, 0.0) and s in (0.0, 0.5)
+
+    A = [[0, 0], [0, 0]]
+    B = [[1, 0], [1, 0]]
+    ret = intersect_segments(*A, *B)
+    assert ret is None
 
 
 def test_cheap_ruler_k():

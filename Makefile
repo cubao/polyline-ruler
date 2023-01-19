@@ -38,6 +38,8 @@ python_sdist:
 	# tar -tvf dist/polyline_ruler-*.tar.gz
 python_test:
 	$(PYTHON) -m pytest tests/test_basic.py --capture tee-sys -vv -x
+pytest: python_test
+.PHONY: python_install python_build python_sdist python_test
 
 # conda create -y -n py36 python=3.6
 # conda create -y -n py37 python=3.7
