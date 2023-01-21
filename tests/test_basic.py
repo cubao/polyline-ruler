@@ -303,3 +303,9 @@ def test_polyline_ruler():
     assert len(ranges) == 12 and ranges[-1] == 110
     ranges, xyzs, dirs = ruler.arrows(10.0 - 1e-9)
     assert len(ranges) == 13 and ranges[-1] == 110
+
+
+def test_polyline_ruler_duplicates():
+    ruler = PolylineRuler([[0, 0, 0], [10, 0, 0], [10, 0, 0], [100, 0, 0]])
+    assert np.all(ruler.ranges() == [0, 10, 10, 100])
+    assert np.all(ruler.dirs() == [[1, 0, 0], [1, 0, 0], [1, 0, 0]])
