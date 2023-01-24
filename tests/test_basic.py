@@ -309,3 +309,14 @@ def test_polyline_ruler_duplicates():
     ruler = PolylineRuler([[0, 0, 0], [10, 0, 0], [10, 0, 0], [100, 0, 0]])
     assert np.all(ruler.ranges() == [0, 10, 10, 100])
     assert np.all(ruler.dirs() == [[1, 0, 0], [1, 0, 0], [1, 0, 0]])
+
+
+def test_polyline_ruler_at():
+    ruler = PolylineRuler([[0, 0, 0], [10, 0, 0], [10, 0, 0], [100, 0, 0]])
+    assert np.all(ruler.ranges() == [0, 10, 10, 100])
+    xyz = ruler.at(2.0)
+    assert np.all(xyz == [2, 0, 0])
+    xyz = ruler.at(2)
+    assert np.all(xyz == [10, 0, 0])
+    xyz = ruler.at(2, t=0.5)
+    assert np.all(xyz == [55, 0, 0])
