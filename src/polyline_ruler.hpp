@@ -14,7 +14,6 @@
 #include <Eigen/Core>
 #include <optional>
 
-#include "cheap_ruler.hpp"
 #include "crs_transform.hpp"
 #include "eigen_helpers.hpp"
 
@@ -94,7 +93,9 @@ intersect_segments(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2,
             if (v_a2 < v_a1) {
                 t = 1.0 - t;
             }
-            return std::make_tuple(Eigen::Vector2d((b1 + b2) / 2.0), t, 0.5);
+            return std::make_tuple(Eigen::Vector2d((b1 + b2) / 2.0), //
+                                   t,                                //
+                                   (s2_x == 0.0 && s2_y == 0.0) ? 0.0 : 0.5);
         }
         // 3) B includes A
         //           a1  o---o a2
@@ -105,7 +106,9 @@ intersect_segments(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2,
             if (v_b2 < v_b1) {
                 t = 1.0 - t;
             }
-            return std::make_tuple(Eigen::Vector2d((a1 + a2) / 2.0), 0.5, t);
+            return std::make_tuple(Eigen::Vector2d((a1 + a2) / 2.0),         //
+                                   (s1_x == 0.0 && s2_x == 0.0) ? 0.0 : 0.5, //
+                                   t);
         }
         // 4) A partially overlaps B, A at left
         //      a1 o-----+--o a2
@@ -219,19 +222,22 @@ struct PolylineRuler
 {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     PolylineRuler(const Eigen::Ref<const RowVectors> &polyline,
-                  bool is_wgs84 = false)
+                  bool is_wgs84 = false, bool pre_compute = false)
         : polyline_(polyline),                        //
           N_(polyline.rows()),                        //
           is_wgs84_(is_wgs84),                        //
-          k_(is_wgs84 ? CheapRuler::k(polyline(0, 1)) //
+          k_(is_wgs84 ? cheap_ruler_k(polyline(0, 1)) //
                       : Eigen::Vector3d::Ones())
     {
+        if (pre_compute) {
+            compute();
+        }
     }
     PolylineRuler(const std::vector<std::array<double, 3>> &polyline,
-                  bool is_wgs84 = false)
+                  bool is_wgs84 = false, bool pre_compute = false)
         : PolylineRuler(
               Eigen::Map<const RowVectors>(&polyline[0][0], polyline.size(), 3),
-              is_wgs84)
+              is_wgs84, pre_compute)
     {
     }
 
@@ -248,6 +254,11 @@ struct PolylineRuler
     const RowVectors &polyline() const { return polyline_; }
     int N() const { return N_; }
     bool is_wgs84() const { return is_wgs84_; }
+    void compute() const
+    {
+        dirs();
+        ranges();
+    }
 
     static Eigen::VectorXd ranges(const Eigen::Ref<const RowVectors> &polyline,
                                   bool is_wgs84 = false)
@@ -419,7 +430,7 @@ struct PolylineRuler
             xyzs.row(i) = arrow.first;
             dirs.row(i) = arrow.second;
         }
-        return std::make_tuple(std::move(ranges), std::move(xyzs),
+        return std::make_tuple((Eigen::VectorXd)ranges, std::move(xyzs),
                                std::move(dirs));
     }
 
