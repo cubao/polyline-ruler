@@ -1,6 +1,6 @@
 site_name: polyline-ruler
 site_url: https://polyline-ruler.readthedocs.io
-site_description:  cubao/polyline-ruler is more than mapbox/cheap-ruler.
+site_description: cubao/polyline-ruler is more than mapbox/cheap-ruler.
 site_author: district10
 
 repo_url: https://github.com/cubao/polyline-ruler
