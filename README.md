@@ -35,6 +35,6 @@ See [`tests/test_basic.py`](tests/test_basic.py).
 
 ## Tests
 
-```
+```bash
 python3 tests/test_basic.py
 ```
