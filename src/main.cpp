@@ -12,6 +12,12 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #include "cheap_ruler.hpp"
 #include "crs_transform.hpp"
 #include "eigen_helpers.hpp"

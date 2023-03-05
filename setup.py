@@ -122,10 +122,10 @@ class CMakeBuild(build_ext):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="polyline_ruler",
-    version="0.0.2",
+    version="0.0.3",
     author="tzx",
     author_email="dvorak4tzx@gmail.com",
-    url="https://github.com/cubao/polyline-ruler",
+    url="https://polyline-ruler.readthedocs.io",
     description="cubao/polyline-ruler is more than mapbox/cheap-ruler",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
