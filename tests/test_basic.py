@@ -291,7 +291,7 @@ def test_polyline_ruler():
     dir1 = ruler.dir(range=10.0)
     np.testing.assert_allclose(dir1, [np.sqrt(1 / 2), np.sqrt(1 / 2), 0.0], atol=1e-9)
     dir2 = ruler.dir(range=10.0, smooth_joint=False)
-    assert np.all(dir2 == [1, 0, 0])
+    assert np.all(dir2 == [0, 1, 0])  # change to new direction at pt (inclusive)
 
     xyz, dir = ruler.arrow(10.0, smooth_joint=False)
     assert np.all(xyz == [10, 0, 0])

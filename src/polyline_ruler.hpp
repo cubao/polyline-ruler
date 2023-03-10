@@ -376,21 +376,19 @@ struct PolylineRuler
 
     Eigen::Vector3d dir(double range, bool smooth_joint = true) const
     {
-        // TODO, test & fix me later
+        if (!smooth_joint) {
+            return dir(segment_index(range));
+        }
+        auto [i, t] = segment_index_t(range);
         auto &dirs = this->dirs();
-        if (range <= 0.0) {
+        if (i == 0) {
             return dirs.row(0);
-        }
-        auto &ranges = this->ranges();
-        int i = 0;
-        while (i + 1 < N_ && ranges[i + 1] < range) {
-            ++i;
-        }
-        if (smooth_joint && i + 1 < N_ && ranges[i + 1] == range) {
-            Eigen::Vector3d dir = dirs.row(i + 1) + dirs.row(i);
+        } else if (t == 0) {
+            Eigen::Vector3d dir = dirs.row(i - 1) + dirs.row(i);
             return dir / dir.norm();
+        } else {
+            return dirs.row(i);
         }
-        return dirs.row(std::min(i, (int)dirs.rows() - 1));
     }
 
     Eigen::Vector3d extended_along(double range) const
