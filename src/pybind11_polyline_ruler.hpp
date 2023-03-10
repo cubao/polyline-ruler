@@ -207,18 +207,46 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
         //
         ;
 
-    m.def("douglas_simplify", &douglas_simplify, //
-          "coords"_a, "epsilon"_a,               //
-          py::kw_only(),                         //
-          "is_wgs84"_a = false,                  //
+    m.def("douglas_simplify",
+          py::overload_cast<const RowVectors &, double, bool,
+                            bool>(&douglas_simplify), //
+          "coords"_a, "epsilon"_a,                    //
+          py::kw_only(),                              //
+          "is_wgs84"_a = false,                       //
           "recursive"_a = true);
-    m.def("douglas_simplify_mask", &douglas_simplify_mask, //
+    m.def(
+        "douglas_simplify",
+        py::overload_cast<const Eigen::Ref<const RowVectorsNx2> &, double, bool,
+                          bool>(&douglas_simplify), //
+        "coords"_a, "epsilon"_a,                    //
+        py::kw_only(),                              //
+        "is_wgs84"_a = false,                       //
+        "recursive"_a = true);
+    m.def("douglas_simplify_mask",
+          py::overload_cast<const RowVectors &, double, bool,
+                            bool>(&douglas_simplify_mask), //
           "coords"_a, "epsilon"_a, py::kw_only(),          //
           "is_wgs84"_a = false,                            //
           "recursive"_a = true);
-    m.def("douglas_simplify_indexes", &douglas_simplify_indexes, //
-          "coords"_a, "epsilon"_a, py::kw_only(),                //
-          "is_wgs84"_a = false,                                  //
+    m.def(
+        "douglas_simplify_mask",
+        py::overload_cast<const Eigen::Ref<const RowVectorsNx2> &, double, bool,
+                          bool>(&douglas_simplify_mask), //
+        "coords"_a, "epsilon"_a, py::kw_only(),          //
+        "is_wgs84"_a = false,                            //
+        "recursive"_a = true);
+    m.def("douglas_simplify_indexes",
+          py::overload_cast<const RowVectors &, double, bool,
+                            bool>(&douglas_simplify_indexes), //
+          "coords"_a, "epsilon"_a, py::kw_only(),             //
+          "is_wgs84"_a = false,                               //
           "recursive"_a = true);
+    m.def(
+        "douglas_simplify_indexes",
+        py::overload_cast<const Eigen::Ref<const RowVectorsNx2> &, double, bool,
+                          bool>(&douglas_simplify_indexes), //
+        "coords"_a, "epsilon"_a, py::kw_only(),             //
+        "is_wgs84"_a = false,                               //
+        "recursive"_a = true);
 }
 } // namespace cubao
