@@ -376,6 +376,7 @@ struct PolylineRuler
 
     Eigen::Vector3d dir(double range, bool smooth_joint = true) const
     {
+        // TODO, test & fix me later
         auto &dirs = this->dirs();
         if (range <= 0.0) {
             return dirs.row(0);
@@ -394,22 +395,7 @@ struct PolylineRuler
 
     Eigen::Vector3d extended_along(double range) const
     {
-        auto &ranges = this->ranges();
-        if (range <= 0.0) {
-            double t = range / ranges[1];
-            return interpolate(polyline_.row(0), polyline_.row(1), t,
-                               is_wgs84_);
-        } else if (range >= length()) {
-            double t =
-                (range - ranges[N_ - 2]) / (ranges[N_ - 1] - ranges[N_ - 2]);
-            return interpolate(polyline_.row(N_ - 2), polyline_.row(N_ - 1), t,
-                               is_wgs84_);
-        }
-        int i = 0;
-        while (i + 1 < N_ && ranges[i + 1] < range) {
-            ++i;
-        }
-        double t = (range - ranges[i]) / (ranges[i + 1] - ranges[i]);
+        auto [i, t] = segment_index_t(range);
         return interpolate(polyline_.row(i), polyline_.row(i + 1), t,
                            is_wgs84_);
     }

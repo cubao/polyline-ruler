@@ -113,12 +113,12 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
              py::kw_only(), "range"_a, "smooth_joint"_a = true)
         .def("extended_along", &PolylineRuler::extended_along, "range"_a)
         .def("at", py::overload_cast<double>(&PolylineRuler::at, py::const_),
-             "range"_a)
+             py::kw_only(), "range"_a)
         .def("at", py::overload_cast<int>(&PolylineRuler::at, py::const_),
-             "segment_index"_a)
+             py::kw_only(), "segment_index"_a)
         .def("at",
              py::overload_cast<int, double>(&PolylineRuler::at, py::const_),
-             "segment_index"_a, py::kw_only(), "t"_a)
+             py::kw_only(), "segment_index"_a, "t"_a)
         .def("arrow", &PolylineRuler::arrow, "range"_a, //
              py::kw_only(), "smooth_joint"_a = true)
         .def("arrows",

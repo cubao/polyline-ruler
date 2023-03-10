@@ -328,11 +328,11 @@ def test_polyline_ruler_duplicates():
 def test_polyline_ruler_at():
     ruler = PolylineRuler([[0, 0, 0], [10, 0, 0], [10, 0, 0], [100, 0, 0]])
     assert np.all(ruler.ranges() == [0, 10, 10, 100])
-    xyz = ruler.at(2.0)
+    xyz = ruler.at(range=2.0)
     assert np.all(xyz == [2, 0, 0])
-    xyz = ruler.at(2)
+    xyz = ruler.at(segment_index=2)
     assert np.all(xyz == [10, 0, 0])
-    xyz = ruler.at(2, t=0.5)
+    xyz = ruler.at(segment_index=2, t=0.5)
     assert np.all(xyz == [55, 0, 0])
 
     assert ruler.segment_index(-1) == 0
