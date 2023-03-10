@@ -1,13 +1,7 @@
 import time
 
 import numpy as np
-from polyline_ruler import (
-    LineSegment,
-    PolylineRuler,
-    douglas_simplify,
-    intersect_segments,
-    tf,
-)
+from polyline_ruler import LineSegment, PolylineRuler, intersect_segments, tf
 from polyline_ruler.tf import cheap_ruler_k
 
 
