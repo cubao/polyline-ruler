@@ -207,64 +207,18 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
         //
         ;
 
-    /*
-    m.def(
-         "douglas_simplify",
-         [](const RowVectors &coords, double epsilon, //
-            bool is_wgs84,                            //
-            bool recursive,                           //
-            const std::string &return_type)
-             -> std::variant<Eigen::VectorXi, RowVectors> {
-             if (return_type == "coords") {
-                 return douglas_simplify(coords, epsilon, is_wgs84, recursive);
-             } else if (return_type == "mask") {
-                 return douglas_simplify_mask(coords, epsilon, is_wgs84,
-                                              recursive);
-             } else if (return_type == "indexes") {
-                 return douglas_simplify_indexes(coords, epsilon, is_wgs84,
-                                                 recursive);
-             } else {
-                 throw std::invalid_argument(
-                     "invalid return_type:" + return_type +
-                     ", should be 'coords' (default), 'mask' or 'indexes'");
-             }
-         },
-         "coords"_a, "epsilon"_a, py::kw_only(), //
-         "is_wgs84"_a = false,                   //
-         "recursive"_a = true,                   //
-         "return_type"_a = "coords",             //
-         "return_type can be 'coords', 'mask', 'indexes'")
-        .def(
-            "douglas_simplify",
-            [](const Eigen::Ref<const RowVectorsNx2> &coords_,
-               double epsilon, //
-               bool is_wgs84,  //
-               bool recursive, //
-               const std::string &return_type)
-                -> std::variant<Eigen::VectorXi, RowVectorsNx2> {
-                auto coords = to_Nx3(coords_);
-                if (return_type == "coords") {
-                    RowVectorsNx2 ret =
-                        douglas_simplify(coords, epsilon, is_wgs84, recursive)
-                            .leftCols(2);
-                    return ret;
-                } else if (return_type == "mask") {
-                    return douglas_simplify_mask(coords, epsilon, is_wgs84,
-                                                 recursive);
-                } else if (return_type == "indexes") {
-                    return douglas_simplify_indexes(coords, epsilon, is_wgs84,
-                                                    recursive);
-                } else {
-                    throw std::invalid_argument(
-                        "invalid return_type:" + return_type +
-                        ", should be 'coords' (default), 'mask' or 'indexes'");
-                }
-            },
-            "coords"_a, "epsilon"_a, py::kw_only(), //
-            "is_wgs84"_a = false,                   //
-            "recursive"_a = true,                   //
-            "return_type"_a = "coords",             //
-            "return_type can be 'coords', 'mask', 'indexes'");
-    */
+    m.def("douglas_simplify", &douglas_simplify, //
+          "coords"_a, "epsilon"_a,               //
+          py::kw_only(),                         //
+          "is_wgs84"_a = false,                  //
+          "recursive"_a = true);
+    m.def("douglas_simplify_mask", &douglas_simplify_mask, //
+          "coords"_a, "epsilon"_a, py::kw_only(),          //
+          "is_wgs84"_a = false,                            //
+          "recursive"_a = true);
+    m.def("douglas_simplify_indexes", &douglas_simplify_indexes, //
+          "coords"_a, "epsilon"_a, py::kw_only(),                //
+          "is_wgs84"_a = false,                                  //
+          "recursive"_a = true);
 }
 } // namespace cubao
