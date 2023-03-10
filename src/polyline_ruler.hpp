@@ -13,6 +13,7 @@
 
 #include <Eigen/Core>
 #include <optional>
+#include <queue>
 
 #include "cheap_ruler.hpp"
 #include "crs_transform.hpp"
@@ -742,31 +743,75 @@ inline void douglas_simplify(const Eigen::Ref<const RowVectors> &coords,
     douglas_simplify(coords, to_keep, max_index, j, epsilon);
 }
 
+void douglas_simplify_iter(const Eigen::Ref<const RowVectors> &coords,
+                           Eigen::VectorXi &to_keep, const double epsilon)
+{
+    std::queue<std::pair<int, int>> q;
+    q.push({0, to_keep.size() - 1});
+    while (!q.empty()) {
+        int i = q.front().first;
+        int j = q.front().second;
+        q.pop();
+        to_keep[i] = to_keep[j] = 1;
+        if (j - i <= 1) {
+            continue;
+        }
+        LineSegment line(coords.row(i), coords.row(j));
+        double max_dist2 = 0.0;
+        int max_index = i;
+        for (int k = i + 1; k < j; ++k) {
+            double dist2 = line.distance2(coords.row(k));
+            if (dist2 > max_dist2) {
+                max_dist2 = dist2;
+                max_index = k;
+            }
+        }
+        if (max_dist2 <= epsilon * epsilon) {
+            continue;
+        }
+        q.push({i, max_index});
+        q.push({max_index, j});
+    }
+}
+
 inline Eigen::VectorXi
 douglas_simplify_mask(const Eigen::Ref<const RowVectors> &coords,
-                      double epsilon, bool is_wgs84 = false)
+                      double epsilon,        //
+                      bool is_wgs84 = false, //
+                      bool recursive = true)
 {
     if (is_wgs84) {
-        return douglas_simplify_mask(lla2enu(coords), epsilon, !is_wgs84);
+        return douglas_simplify_mask(lla2enu(coords), epsilon, //
+                                     false, recursive);
     }
     Eigen::VectorXi mask(coords.rows());
     mask.setZero();
-    douglas_simplify(coords, mask, 0, mask.size() - 1, epsilon);
+    if (recursive) {
+        douglas_simplify(coords, mask, 0, mask.size() - 1, epsilon);
+    } else {
+        douglas_simplify_iter(coords, mask, epsilon);
+    }
     return mask;
 }
 
 inline Eigen::VectorXi
 douglas_simplify_indexes(const Eigen::Ref<const RowVectors> &coords,
-                         double epsilon, bool is_wgs84 = false)
+                         double epsilon,        //
+                         bool is_wgs84 = false, //
+                         bool recursive = true)
 {
-    return mask2indexes(douglas_simplify_mask(coords, epsilon, is_wgs84));
+    return mask2indexes(
+        douglas_simplify_mask(coords, epsilon, is_wgs84, recursive));
 }
 
 inline RowVectors douglas_simplify(const Eigen::Ref<const RowVectors> &coords,
-                                   double epsilon, bool is_wgs84 = false)
+                                   double epsilon,        //
+                                   bool is_wgs84 = false, //
+                                   bool recursive = true)
 {
-    return select_by_mask(coords,
-                          douglas_simplify_mask(coords, epsilon, is_wgs84));
+    return select_by_mask(
+        coords, //
+        douglas_simplify_mask(coords, epsilon, is_wgs84, recursive));
 }
 
 } // namespace cubao

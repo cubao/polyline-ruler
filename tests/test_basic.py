@@ -1,7 +1,13 @@
 import time
 
 import numpy as np
-from polyline_ruler import LineSegment, PolylineRuler, intersect_segments, tf
+from polyline_ruler import (
+    LineSegment,
+    PolylineRuler,
+    douglas_simplify,
+    intersect_segments,
+    tf,
+)
 from polyline_ruler.tf import cheap_ruler_k
 
 
@@ -320,3 +326,40 @@ def test_polyline_ruler_at():
     assert np.all(xyz == [10, 0, 0])
     xyz = ruler.at(2, t=0.5)
     assert np.all(xyz == [55, 0, 0])
+
+
+def test_douglas():
+    # Nx2
+    assert douglas_simplify([[1, 1], [2, 2], [3, 3], [4, 4]], epsilon=1e-9).shape == (
+        2,
+        2,
+    )
+    assert douglas_simplify([[0, 0], [5, 1 + 1e-3], [10, 0]], epsilon=1).shape == (3, 2)
+    assert douglas_simplify([[0, 0], [5, 1 - 1e-3], [10, 0]], epsilon=1).shape == (2, 2)
+
+    # Nx3
+    assert douglas_simplify(
+        [[1, 1, 0], [2, 2, 0], [3, 3, 0], [4, 4, 0]], epsilon=1e-9
+    ).shape == (
+        2,
+        3,
+    )
+    assert douglas_simplify(
+        [[0, 0, 0], [5, 1 + 1e-3, 0], [10, 0, 0]], epsilon=1
+    ).shape == (3, 3)
+    assert douglas_simplify(
+        [[0, 0, 0], [5, 1 - 1e-3, 0], [10, 0, 0]], epsilon=1
+    ).shape == (2, 3)
+
+    # return mask
+    mask = douglas_simplify(
+        [[1, 1, 0], [2, 2, 0], [3, 3, 0], [4, 4, 0]], epsilon=1e-9, return_type="mask"
+    )
+    assert np.all(mask == [1, 0, 0, 1])
+    # return indexes
+    indexes = douglas_simplify(
+        [[1, 1, 0], [2, 2, 0], [3, 3, 0], [4, 4, 0]],
+        epsilon=1e-9,
+        return_type="indexes",
+    )
+    assert np.all(indexes == [0, 3])
