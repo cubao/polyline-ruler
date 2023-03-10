@@ -292,6 +292,22 @@ struct PolylineRuler
         return ranges[seg_idx] * (1.0 - t) + ranges[seg_idx + 1] * t;
     }
 
+    int segment_index(double range) const
+    {
+        const double *ranges = this->ranges().data();
+        int I = std::upper_bound(ranges, ranges + N_, range) - ranges;
+        return std::min(std::max(0, I - 1), N_ - 2);
+    }
+
+    std::pair<int, double> segment_index_t(double range) const
+    {
+        const double *ranges = this->ranges().data();
+        int I = std::upper_bound(ranges, ranges + N_, range) - ranges;
+        int i = std::min(std::max(0, I - 1), N_ - 2);
+        double t = (range - ranges[i]) / (ranges[i + 1] - ranges[i]);
+        return {i, t};
+    }
+
     double length() const { return ranges()[N_ - 1]; }
 
     static RowVectors dirs(const Eigen::Ref<const RowVectors> &polyline,
@@ -351,6 +367,11 @@ struct PolylineRuler
             dirs_ = dirs(polyline_, is_wgs84_);
         }
         return *dirs_;
+    }
+
+    Eigen::Vector3d dir(int pt_index) const
+    {
+        return dirs().row(std::min(pt_index, N_ - 2));
     }
 
     Eigen::Vector3d dir(double range, bool smooth_joint = true) const

@@ -93,6 +93,9 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
              py::overload_cast<int, double>(&PolylineRuler::range, py::const_),
              py::kw_only(), "segment_index"_a, "t"_a)
         //
+        .def("segment_index", &PolylineRuler::segment_index, "range"_a)
+        .def("segment_index_t", &PolylineRuler::segment_index_t, "range"_a)
+        //
         .def("length", &PolylineRuler::length)
         //
         .def_static(
@@ -103,9 +106,11 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
         .def("dirs", py::overload_cast<>(&PolylineRuler::dirs, py::const_),
              rvp::reference_internal)
         //
+        .def("dir", py::overload_cast<int>(&PolylineRuler::dir, py::const_),
+             py::kw_only(), "point_index"_a)
         .def("dir",
              py::overload_cast<double, bool>(&PolylineRuler::dir, py::const_),
-             "range"_a, py::kw_only(), "smooth_joint"_a = true)
+             py::kw_only(), "range"_a, "smooth_joint"_a = true)
         .def("extended_along", &PolylineRuler::extended_along, "range"_a)
         .def("at", py::overload_cast<double>(&PolylineRuler::at, py::const_),
              "range"_a)
