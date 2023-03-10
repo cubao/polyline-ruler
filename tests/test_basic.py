@@ -310,6 +310,15 @@ def test_polyline_ruler():
     ranges, xyzs, dirs = ruler.arrows(10.0 - 1e-9)
     assert len(ranges) == 13 and ranges[-1] == 110
 
+    ruler = PolylineRuler([[0, 0, 0], [1, 0, 0], [1, 1, 0]])
+    assert np.all(ruler.dirs() == [[1, 0, 0], [0, 1, 0]])
+    np.testing.assert_allclose(ruler.dir(range=0.0), [1, 0, 0], atol=1e-9)
+    np.testing.assert_allclose(ruler.dir(range=0.5), [1, 0, 0], atol=1e-9)
+    np.testing.assert_allclose(
+        ruler.dir(range=1.0), [np.sqrt(1 / 2), np.sqrt(1 / 2), 0.0], atol=1e-9
+    )
+    np.testing.assert_allclose(ruler.dir(range=1.5), [0, 1, 0], atol=1e-9)
+
 
 def test_polyline_ruler_dir():
     ruler = PolylineRuler([[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]])
