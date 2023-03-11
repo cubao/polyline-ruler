@@ -369,6 +369,14 @@ def test_douglas():
     assert douglas_simplify([[0, 0], [5, 1 + 1e-3], [10, 0]], epsilon=1).shape == (3, 2)
     assert douglas_simplify([[0, 0], [5, 1 - 1e-3], [10, 0]], epsilon=1).shape == (2, 2)
 
+    # Nx3
+    assert douglas_simplify(
+        [[1, 1, 0], [2, 2, 0], [3, 3, 0], [4, 4, 0]], epsilon=1e-9
+    ).shape == (
+        2,
+        3,
+    )
+
     # return mask
     mask = douglas_simplify_mask(
         [[1, 1, 0], [2, 2, 0], [3, 3, 0], [4, 4, 0]], epsilon=1e-9

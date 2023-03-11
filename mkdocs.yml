@@ -15,4 +15,4 @@ nav:
         - License: about/license.md
 plugins:
   - include-markdown
-copyright: Copyright &copy; 2023 <a href="https://github.com/cubao">cubao team</a>.
+copyright: Copyright &copy; 2023 <a href="https://cubao.readthedocs.io">cubao team</a>.
