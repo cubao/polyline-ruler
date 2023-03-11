@@ -10,6 +10,12 @@ To upgrade `polyline-ruler` to the latest version, use pip:
 pip install -U polyline-ruler
 ```
 
+## Version 0.0.4 (2023-03-11)
+
+*   Misc updates
+    *   Update dir logic
+    *   Integrate douglas_simplify iter
+
 ## Version 0.0.3 (2023-03-05)
 
 *   Use GitHub workflow to release to pypi

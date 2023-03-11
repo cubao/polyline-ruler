@@ -1,7 +1,15 @@
 import time
 
 import numpy as np
-from polyline_ruler import LineSegment, PolylineRuler, intersect_segments, tf
+from polyline_ruler import (
+    LineSegment,
+    PolylineRuler,
+    douglas_simplify,
+    douglas_simplify_indexes,
+    douglas_simplify_mask,
+    intersect_segments,
+    tf,
+)
 from polyline_ruler.tf import cheap_ruler_k
 
 
@@ -282,10 +290,10 @@ def test_polyline_ruler():
     assert dirs.shape == (3, 3)
     assert np.all(dirs == [[1, 0, 0], [0, 1, 0], [1, 0, 0]])
 
-    dir1 = ruler.dir(10)
+    dir1 = ruler.dir(range=10.0)
     np.testing.assert_allclose(dir1, [np.sqrt(1 / 2), np.sqrt(1 / 2), 0.0], atol=1e-9)
-    dir2 = ruler.dir(10, smooth_joint=False)
-    assert np.all(dir2 == [1, 0, 0])
+    dir2 = ruler.dir(range=10.0, smooth_joint=False)
+    assert np.all(dir2 == [0, 1, 0])  # change to new direction at pt (inclusive)
 
     xyz, dir = ruler.arrow(10.0, smooth_joint=False)
     assert np.all(xyz == [10, 0, 0])
@@ -304,6 +312,23 @@ def test_polyline_ruler():
     ranges, xyzs, dirs = ruler.arrows(10.0 - 1e-9)
     assert len(ranges) == 13 and ranges[-1] == 110
 
+    ruler = PolylineRuler([[0, 0, 0], [1, 0, 0], [1, 1, 0]])
+    assert np.all(ruler.dirs() == [[1, 0, 0], [0, 1, 0]])
+    np.testing.assert_allclose(ruler.dir(range=0.0), [1, 0, 0], atol=1e-9)
+    np.testing.assert_allclose(ruler.dir(range=0.5), [1, 0, 0], atol=1e-9)
+    np.testing.assert_allclose(
+        ruler.dir(range=1.0), [np.sqrt(1 / 2), np.sqrt(1 / 2), 0.0], atol=1e-9
+    )
+    np.testing.assert_allclose(ruler.dir(range=1.5), [0, 1, 0], atol=1e-9)
+
+
+def test_polyline_ruler_dir():
+    ruler = PolylineRuler([[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]])
+    assert np.all(ruler.dir(point_index=0) == [1, 0, 0])
+    assert np.all(ruler.dir(point_index=1) == [0, 1, 0])
+    assert np.all(ruler.dir(point_index=2) == [-1, 0, 0])
+    assert np.all(ruler.dir(point_index=3) == [-1, 0, 0])
+
 
 def test_polyline_ruler_duplicates():
     ruler = PolylineRuler([[0, 0, 0], [10, 0, 0], [10, 0, 0], [100, 0, 0]])
@@ -314,9 +339,52 @@ def test_polyline_ruler_duplicates():
 def test_polyline_ruler_at():
     ruler = PolylineRuler([[0, 0, 0], [10, 0, 0], [10, 0, 0], [100, 0, 0]])
     assert np.all(ruler.ranges() == [0, 10, 10, 100])
-    xyz = ruler.at(2.0)
+    xyz = ruler.at(range=2.0)
     assert np.all(xyz == [2, 0, 0])
-    xyz = ruler.at(2)
+    xyz = ruler.at(segment_index=2)
     assert np.all(xyz == [10, 0, 0])
-    xyz = ruler.at(2, t=0.5)
+    xyz = ruler.at(segment_index=2, t=0.5)
     assert np.all(xyz == [55, 0, 0])
+
+    assert ruler.segment_index(-1) == 0
+    assert ruler.segment_index(9) == 0
+    assert ruler.segment_index(10) == 2
+    assert ruler.segment_index(10) == 2
+    assert ruler.segment_index(100) == 2
+    assert ruler.segment_index(200) == 2
+
+    np.testing.assert_allclose(ruler.segment_index_t(-1), [0, -0.1], atol=1e-9)
+    np.testing.assert_allclose(ruler.segment_index_t(9), [0, 0.9], atol=1e-9)
+    np.testing.assert_allclose(ruler.segment_index_t(10), [2, 0.0], atol=1e-9)
+    np.testing.assert_allclose(ruler.segment_index_t(100), [2, 1.0], atol=1e-9)
+    np.testing.assert_allclose(ruler.segment_index_t(190), [2, 2.0], atol=1e-9)
+
+
+def test_douglas():
+    # Nx2
+    assert douglas_simplify([[1, 1], [2, 2], [3, 3], [4, 4]], epsilon=1e-9).shape == (
+        2,
+        2,
+    )
+    assert douglas_simplify([[0, 0], [5, 1 + 1e-3], [10, 0]], epsilon=1).shape == (3, 2)
+    assert douglas_simplify([[0, 0], [5, 1 - 1e-3], [10, 0]], epsilon=1).shape == (2, 2)
+
+    # Nx3
+    assert douglas_simplify(
+        [[1, 1, 0], [2, 2, 0], [3, 3, 0], [4, 4, 0]], epsilon=1e-9
+    ).shape == (
+        2,
+        3,
+    )
+
+    # return mask
+    mask = douglas_simplify_mask(
+        [[1, 1, 0], [2, 2, 0], [3, 3, 0], [4, 4, 0]], epsilon=1e-9
+    )
+    assert np.all(mask == [1, 0, 0, 1])
+    # return indexes
+    indexes = douglas_simplify_indexes(
+        [[1, 1, 0], [2, 2, 0], [3, 3, 0], [4, 4, 0]],
+        epsilon=1e-9,
+    )
+    assert np.all(indexes == [0, 3])
