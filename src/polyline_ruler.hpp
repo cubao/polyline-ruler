@@ -249,6 +249,7 @@ struct PolylineRuler
     const RowVectors &polyline() const { return polyline_; }
     int N() const { return N_; }
     bool is_wgs84() const { return is_wgs84_; }
+    Eigen::Vector3d k() const { return k_; }
 
     static Eigen::VectorXd ranges(const Eigen::Ref<const RowVectors> &polyline,
                                   bool is_wgs84 = false)

@@ -79,6 +79,7 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
         .def("polyline", &PolylineRuler::polyline, rvp::reference_internal)
         .def("N", &PolylineRuler::N)
         .def("is_wgs84", &PolylineRuler::is_wgs84)
+        .def("k", &PolylineRuler::k)
         //
         .def_static(
             "_ranges",
