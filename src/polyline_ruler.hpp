@@ -407,6 +407,12 @@ struct PolylineRuler
                            t, is_wgs84_);
     }
 
+    std::pair<Eigen::Vector3d, Eigen::Vector3d> arrow(int seg_idx,
+                                                      double t) const
+    {
+        return std::make_pair(at(seg_idx, t), dir(seg_idx));
+    }
+
     std::pair<Eigen::Vector3d, Eigen::Vector3d>
     arrow(double range, bool smooth_joint = true) const
     {

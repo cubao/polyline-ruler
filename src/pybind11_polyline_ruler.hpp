@@ -119,7 +119,12 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
         .def("at",
              py::overload_cast<int, double>(&PolylineRuler::at, py::const_),
              py::kw_only(), "segment_index"_a, "t"_a)
-        .def("arrow", &PolylineRuler::arrow, "range"_a, //
+        .def("arrow",
+             py::overload_cast<int, double>(&PolylineRuler::arrow, py::const_),
+             py::kw_only(), "index"_a, "t"_a)
+        .def("arrow",
+             py::overload_cast<double, bool>(&PolylineRuler::arrow, py::const_),
+             "range"_a, //
              py::kw_only(), "smooth_joint"_a = true)
         .def("arrows",
              py::overload_cast<const Eigen::Ref<const Eigen::VectorXd> &, bool>(
