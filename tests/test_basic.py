@@ -305,6 +305,10 @@ def test_polyline_ruler():
     assert np.all(xyz == [101, 10, 0])
     assert np.all(dir == [1, 0, 0])
 
+    xyz, dir = ruler.arrow(index=0, t=0.2)
+    assert np.all(xyz == [2, 0, 0])
+    assert np.all(dir == [1, 0, 0])
+
     ranges, xyzs, dirs = ruler.arrows([-1, 10, 111])
     assert len(ranges) == len(xyzs) == len(dirs)
     ranges, xyzs, dirs = ruler.arrows(10.0)
