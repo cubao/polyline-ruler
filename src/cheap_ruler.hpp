@@ -41,6 +41,7 @@ using polygon = RowVectors;
 class CheapRuler
 {
 
+  public:
     // Values that define WGS84 ellipsoid model of the Earth
     static constexpr double RE = 6378.137;            // equatorial radius
     static constexpr double FE = 1.0 / 298.257223563; // flattening
@@ -48,7 +49,6 @@ class CheapRuler
     static constexpr double E2 = FE * (2 - FE);
     static constexpr double RAD = M_PI / 180.0;
 
-  public:
     enum Unit
     {
         Kilometers,

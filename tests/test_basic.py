@@ -2,6 +2,7 @@ import time
 
 import numpy as np
 from polyline_ruler import (
+    CheapRuler,
     LineSegment,
     PolylineRuler,
     douglas_simplify,
@@ -392,3 +393,21 @@ def test_douglas():
         epsilon=1e-9,
     )
     assert np.all(indexes == [0, 3])
+
+
+def test_cheap_ruler():
+    assert CheapRuler.RE
+    assert CheapRuler.FE
+    assert CheapRuler.E2
+    assert CheapRuler.RAD
+    print(CheapRuler.Unit.__members__)
+    assert CheapRuler.Unit.Meters == CheapRuler.Unit.Metres
+    print(CheapRuler.Unit.Kilometers)
+    assert str(CheapRuler.Unit.Kilometers) == "Unit.Kilometers"
+    assert int(CheapRuler.Unit.Kilometers) == 0
+    k1 = CheapRuler._k(20.0)
+    k2 = CheapRuler._k(20.0, unit=CheapRuler.Unit.Kilometers)
+    assert np.linalg.norm(k1 - k2 * 1000) < 1e-8
+
+
+test_cheap_ruler()
