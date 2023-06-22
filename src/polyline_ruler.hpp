@@ -381,17 +381,35 @@ struct PolylineRuler
     }
     Eigen::Vector3d __enu2lla(const Eigen::Vector3d &enu) const
     {
-        // return (enu.array() / k_.array()) + polyline_.row(0).array();
-        return enu2lla(Eigen::Map<const RowVectors>(&enu[0], 1, 3),
-                       polyline_.row(0))
-            .row(0);
+        return (enu.array() / k_.array()) + Eigen::Array3d(polyline_(0, 0),
+                                                           polyline_(0, 1),
+                                                           polyline_(0, 2));
     }
     Eigen::Vector3d __lla2enu(const Eigen::Vector3d &lla) const
     {
-        // return (lla - polyline_.row(0)).array() * k_.array();
-        return lla2enu(Eigen::Map<const RowVectors>(&lla[0], 1, 3),
-                       polyline_.row(0))
-            .row(0);
+        return k_.array() * (lla - Eigen::Vector3d(polyline_(0, 0), //
+                                                   polyline_(0, 1), //
+                                                   polyline_(0, 2)))
+                                .array();
+    }
+
+    RowVectors __enu2lla(const RowVectors &enus) const
+    {
+        RowVectors llas = enus;
+        for (int i = 0; i < 3; ++i) {
+            llas.col(i).array() /= k_[i];
+            llas.col(i).array() += polyline_(0, i);
+        }
+        return llas;
+    }
+    RowVectors __lla2enu(const RowVectors &llas) const
+    {
+        RowVectors enus = llas;
+        for (int i = 0; i < 3; ++i) {
+            enus.col(i).array() -= polyline_(0, i);
+            enus.col(i).array() *= k_[i];
+        }
+        return enus;
     }
 
   public:
@@ -420,8 +438,7 @@ struct PolylineRuler
     Eigen::Vector3d extended_along(double range) const
     {
         auto [i, t] = segment_index_t(range);
-        return interpolate(polyline_.row(i), polyline_.row(i + 1), t,
-                           is_wgs84_);
+        return interpolate(polyline_.row(i), polyline_.row(i + 1), t);
     }
 
     Eigen::Vector3d at(double range) const { return extended_along(range); }
@@ -430,7 +447,7 @@ struct PolylineRuler
     {
         return interpolate(polyline_.row(seg_idx),     //
                            polyline_.row(seg_idx + 1), //
-                           t, is_wgs84_);
+                           t);
     }
 
     std::pair<Eigen::Vector3d, Eigen::Vector3d> arrow(int seg_idx,
@@ -457,8 +474,8 @@ struct PolylineRuler
             xyzs.row(i) = arrow.first;
             dirs.row(i) = arrow.second;
         }
-        return std::make_tuple(std::move(ranges), std::move(xyzs),
-                               std::move(dirs));
+        return std::make_tuple(std::move(ranges), //
+                               std::move(xyzs), std::move(dirs));
     }
 
     std::tuple<Eigen::VectorXd, RowVectors, RowVectors>
@@ -701,8 +718,7 @@ struct PolylineRuler
         if (!is_wgs84_) {
             return lineSlice(start, stop, polyline_);
         }
-        return enu2lla(lineSlice(__lla2enu(start), __lla2enu(stop), enus()),
-                       polyline_.row(0));
+        return __enu2lla(lineSlice(__lla2enu(start), __lla2enu(stop), enus()));
     }
 
     static RowVectors lineSliceAlong(double start, double stop,
@@ -746,23 +762,12 @@ struct PolylineRuler
         if (!is_wgs84_) {
             return lineSliceAlong(start, stop, polyline_);
         }
-        return enu2lla(lineSliceAlong(start, stop, enus()), polyline_.row(0));
+        return __enu2lla(lineSliceAlong(start, stop, enus()));
     }
 
     static Eigen::Vector3d interpolate(const Eigen::Vector3d &a,
-                                       const Eigen::Vector3d &b, double t,
-                                       bool is_wgs84 = false)
+                                       const Eigen::Vector3d &b, double t)
     {
-        if (is_wgs84) {
-            RowVectors llas(2, 3);
-            llas.row(0) = a;
-            llas.row(1) = b;
-            auto enus = lla2enu(llas);
-            return enu2lla(interpolate(enus.row(0), enus.row(1), t, !is_wgs84)
-                               .transpose(),
-                           llas.row(0))
-                .row(0);
-        }
         return a + (b - a) * t;
     }
 };
