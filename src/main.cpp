@@ -27,6 +27,7 @@
 
 #include "pybind11_crs_transform.hpp"
 #include "pybind11_polyline_ruler.hpp"
+#include "pybind11_cheap_ruler.hpp"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -53,6 +54,7 @@ PYBIND11_MODULE(polyline_ruler, m)
     cubao::bind_crs_transform(tf);
 
     cubao::bind_polyline_ruler(m);
+    cubao::bind_cheap_ruler(m);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
