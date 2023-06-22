@@ -10,6 +10,10 @@ To upgrade `polyline-ruler` to the latest version, use pip:
 pip install -U polyline-ruler
 ```
 
+## Version 0.0.5 (2023-06-23)
+
+*   Faster pointOnLine by lla2enu hard copy once
+
 ## Version 0.0.4 (2023-03-11)
 
 *   Misc updates
