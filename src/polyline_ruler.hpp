@@ -475,7 +475,8 @@ struct PolylineRuler
             dirs.row(i) = arrow.second;
         }
         return std::make_tuple(std::move(ranges), //
-                               std::move(xyzs), std::move(dirs));
+                               std::move(xyzs),   //
+                               std::move(dirs));
     }
 
     std::tuple<Eigen::VectorXd, RowVectors, RowVectors>
