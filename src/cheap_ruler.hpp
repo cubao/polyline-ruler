@@ -160,7 +160,7 @@ class CheapRuler
     //
     // Returns the bearing between two points in angles.
     //        0
-    //   45         45
+    //   -45         45
     // -90              90
     // -135         135
     //       180
@@ -472,14 +472,15 @@ class CheapRuler
         return point(a[0] + dx * t, a[1] + dy * t, a[2] + dz * t);
     }
 
-  private:
-    double ky;
-    double kx;
-    double kz;
     static double longDiff(double a, double b)
     {
         return std::remainder(a - b, 360);
     }
+
+  private:
+    double ky;
+    double kx;
+    double kz;
 };
 
 } // namespace cheap_ruler

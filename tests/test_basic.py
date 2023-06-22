@@ -409,5 +409,29 @@ def test_cheap_ruler():
     k2 = CheapRuler._k(20.0, unit=CheapRuler.Unit.Kilometers)
     assert np.linalg.norm(k1 - k2 * 1000) < 1e-8
 
+    ruler = CheapRuler(45.0)
+    np.testing.assert_allclose(ruler.k(), [78846.8350939781, 111131.7774141756, 1.0])
 
-test_cheap_ruler()
+    CheapRuler._fromTile(10, 32)
+    ruler.squareDistance([120, 34, 5], [121, 34, 5])
+    assert (
+        ruler.distance([120, 34, 5], [121, 34, 5])
+        == ruler.delta([120, 34, 5], [121, 34, 5])[0]
+    )
+
+    assert ruler.bearing([120, 34, 5], [121, 34, 5]) == 90.0
+    assert ruler.bearing([122, 34, 5], [121, 34, 5]) == -90.0
+    assert ruler.bearing([120, 34, 5], [120, 33, 5]) == 180.0
+
+    ruler.destination([120, 34, 5], 100, 0)
+    ruler.destination([120, 34, 5], 100, 90)
+
+    pt = ruler.offset([120, 34, 5], 300, 400)
+    assert abs(ruler.distance([120, 34, 5], pt) - 500) < 1e-6
+    dist = ruler.lineDistance(
+        [
+            [120, 34, 5],
+            [120, 35, 5],
+        ]
+    )
+    assert dist == ruler.k()[1]

@@ -47,6 +47,33 @@ CUBAO_INLINE void bind_cheap_ruler(py::module &m)
         .def_readonly_static("E2", &CheapRuler::E2)
         .def_readonly_static("RAD", &CheapRuler::RAD)
         //
-        ;
+        .def(py::init<double, CheapRuler::Unit>(), "latitude"_a, py::kw_only(),
+             "unit"_a = CheapRuler::Unit::Meters)
+        //
+        .def_static("_fromTile", &CheapRuler::fromTile, "x"_a, "y"_a)
+        .def("delta", &CheapRuler::delta, "lla0"_a, "lla1"_a)
+        .def("squareDistance", &CheapRuler::squareDistance, "a"_a, "b"_a)
+        .def("distance", &CheapRuler::distance, "a"_a, "b"_a)
+        .def("bearing", &CheapRuler::bearing, "a"_a, "b"_a)
+        .def("destination", &CheapRuler::destination, "origin"_a, "dist"_a,
+             "bearing"_a)
+        .def("offset", &CheapRuler::offset, "origin"_a, "dx"_a, "dy"_a,
+             "dz"_a = 0.0)
+        .def("lineDistance", &CheapRuler::lineDistance, "points"_a)
+        .def("area", &CheapRuler::area, "ring"_a)
+        .def("along", &CheapRuler::along, "line"_a, "dist"_a)
+        .def("pointToSegmentDistance", &CheapRuler::pointToSegmentDistance,
+             "p"_a, "a"_a, "b"_a)
+        .def("pointOnLine", &CheapRuler::pointOnLine, "line"_a, "p"_a)
+        .def("lineSlice", &CheapRuler::lineSlice, "start"_a, "stop"_a, "line"_a)
+        .def("lineSliceAlong", &CheapRuler::lineSliceAlong, "start"_a, "stop"_a,
+             "line"_a)
+        .def("bufferPoint", &CheapRuler::bufferPoint, "p"_a, "buffer"_a)
+        .def("bufferBBox", &CheapRuler::bufferBBox, "bbox"_a, "buffer"_a)
+        .def_static("_insideBBox", &CheapRuler::insideBBox, "p"_a, "bbox"_a,
+                    py::kw_only(), "cheak_z"_a = false)
+        .def_static("_interpolate", &CheapRuler::interpolate, "a"_a, "b"_a,
+                    "t"_a)
+        .def_static("_longDiff", &CheapRuler::longDiff, "a"_a, "b"_a);
 }
 } // namespace cubao
