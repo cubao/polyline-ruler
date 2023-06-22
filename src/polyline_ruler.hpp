@@ -15,7 +15,6 @@
 #include <optional>
 #include <queue>
 
-#include "cheap_ruler.hpp"
 #include "crs_transform.hpp"
 #include "eigen_helpers.hpp"
 
@@ -224,7 +223,7 @@ struct PolylineRuler
         : polyline_(polyline),                        //
           N_(polyline.rows()),                        //
           is_wgs84_(is_wgs84),                        //
-          k_(is_wgs84 ? CheapRuler::k(polyline(0, 1)) //
+          k_(is_wgs84 ? cheap_ruler_k(polyline(0, 1)) //
                       : Eigen::Vector3d::Ones())
     {
     }
@@ -755,8 +754,9 @@ inline void douglas_simplify(const Eigen::Ref<const RowVectors> &coords,
     douglas_simplify(coords, to_keep, max_index, j, epsilon);
 }
 
-void douglas_simplify_iter(const Eigen::Ref<const RowVectors> &coords,
-                           Eigen::VectorXi &to_keep, const double epsilon)
+inline void douglas_simplify_iter(const Eigen::Ref<const RowVectors> &coords,
+                                  Eigen::VectorXi &to_keep,
+                                  const double epsilon)
 {
     std::queue<std::pair<int, int>> q;
     q.push({0, to_keep.size() - 1});
