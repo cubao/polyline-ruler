@@ -97,7 +97,7 @@ tar.gz:
 	tar -cvz --exclude .git -f ../polyline-ruler.tar.gz .
 	ls -alh ../polyline-ruler.tar.gz
 
-SYNC_OUTPUT_DIR := headers/include/cubao
+SYNC_OUTPUT_DIR ?= headers/include/cubao
 sync_headers:
 	mkdir -p $(SYNC_OUTPUT_DIR)
 	cp src/cheap_ruler.hpp $(SYNC_OUTPUT_DIR)
@@ -105,6 +105,7 @@ sync_headers:
 	cp src/cubao_inline.hpp $(SYNC_OUTPUT_DIR)
 	cp src/eigen_helpers.hpp $(SYNC_OUTPUT_DIR)
 	cp src/polyline_ruler.hpp $(SYNC_OUTPUT_DIR)
+	cp src/pybind11_cheap_ruler.hpp $(SYNC_OUTPUT_DIR)
 	cp src/pybind11_crs_transform.hpp $(SYNC_OUTPUT_DIR)
 	cp src/pybind11_polyline_ruler.hpp $(SYNC_OUTPUT_DIR)
 

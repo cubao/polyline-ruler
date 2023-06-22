@@ -243,6 +243,7 @@ struct PolylineRuler
     // cache
     mutable std::optional<Eigen::VectorXd> ranges_;
     mutable std::optional<RowVectors> dirs_;
+    mutable std::optional<RowVectors> enus_; // only when is_wgs84==true
 
   public:
     const RowVectors &polyline() const { return polyline_; }
@@ -369,6 +370,31 @@ struct PolylineRuler
         return *dirs_;
     }
 
+  private:
+    const RowVectors &enus() const
+    {
+        assert(is_wgs84_);
+        if (!enus_) {
+            enus_ = lla2enu(polyline_);
+        }
+        return *enus_;
+    }
+    Eigen::Vector3d __enu2lla(const Eigen::Vector3d &enu) const
+    {
+        // return (enu.array() / k_.array()) + polyline_.row(0).array();
+        return enu2lla(Eigen::Map<const RowVectors>(&enu[0], 1, 3),
+                       polyline_.row(0))
+            .row(0);
+    }
+    Eigen::Vector3d __lla2enu(const Eigen::Vector3d &lla) const
+    {
+        // return (lla - polyline_.row(0)).array() * k_.array();
+        return lla2enu(Eigen::Map<const RowVectors>(&lla[0], 1, 3),
+                       polyline_.row(0))
+            .row(0);
+    }
+
+  public:
     Eigen::Vector3d dir(int pt_index) const
     {
         return dirs().row(std::min(pt_index, N_ - 2));
@@ -535,7 +561,8 @@ struct PolylineRuler
     }
     Eigen::Vector3d along(double dist) const
     {
-        return along(polyline_, dist, is_wgs84_);
+        return is_wgs84_ ? __enu2lla(along(enus(), dist))
+                         : along(polyline_, dist);
     }
 
     static double pointToSegmentDistance(const Eigen::Vector3d &p,
@@ -608,7 +635,11 @@ struct PolylineRuler
     std::tuple<Eigen::Vector3d, int, double>
     pointOnLine(const Eigen::Vector3d &p) const
     {
-        return pointOnLine(polyline_, p, is_wgs84_);
+        if (!is_wgs84_) {
+            return pointOnLine(polyline_, p);
+        }
+        auto [enu, i, t] = pointOnLine(enus(), __lla2enu(p));
+        return std::make_tuple(__enu2lla(enu), i, t);
     }
 
     static RowVectors lineSlice(const Eigen::Vector3d &start,
@@ -667,7 +698,11 @@ struct PolylineRuler
     RowVectors lineSlice(const Eigen::Vector3d &start,
                          const Eigen::Vector3d &stop) const
     {
-        return lineSlice(start, stop, polyline_, is_wgs84_);
+        if (!is_wgs84_) {
+            return lineSlice(start, stop, polyline_);
+        }
+        return enu2lla(lineSlice(__lla2enu(start), __lla2enu(stop), enus()),
+                       polyline_.row(0));
     }
 
     static RowVectors lineSliceAlong(double start, double stop,
@@ -708,7 +743,10 @@ struct PolylineRuler
     }
     RowVectors lineSliceAlong(double start, double stop) const
     {
-        return lineSliceAlong(start, stop, polyline_, is_wgs84_);
+        if (!is_wgs84_) {
+            return lineSliceAlong(start, stop, polyline_);
+        }
+        return enu2lla(lineSliceAlong(start, stop, enus()), polyline_.row(0));
     }
 
     static Eigen::Vector3d interpolate(const Eigen::Vector3d &a,
