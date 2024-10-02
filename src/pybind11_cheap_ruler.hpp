@@ -38,11 +38,12 @@ CUBAO_INLINE void bind_cheap_ruler(py::module &m)
 
     cheap_ruler //
         .def("k", py::overload_cast<>(&CheapRuler::k, py::const_),
+             "latitude"_a, py::kw_only(), "unit"_a = CheapRuler::Unit::Meters,
              "Get the ruler's unit conversion factor.")
         .def_static(
             "_k", py::overload_cast<double, CheapRuler::Unit>(&CheapRuler::k),
-            "Get the unit conversion factor for a given latitude and unit.",
-            "latitude"_a, py::kw_only(), "unit"_a = CheapRuler::Unit::Meters)
+            "latitude"_a, py::kw_only(), "unit"_a = CheapRuler::Unit::Meters,
+            "Get the unit conversion factor for a given latitude and unit.")
 
         .def_readonly_static("RE", &CheapRuler::RE, "Earth's equatorial radius in meters.")
         .def_readonly_static("FE", &CheapRuler::FE, "Earth's flattening.")
@@ -50,65 +51,65 @@ CUBAO_INLINE void bind_cheap_ruler(py::module &m)
         .def_readonly_static("RAD", &CheapRuler::RAD, "Conversion factor from degrees to radians.")
         //
         .def(py::init<double, CheapRuler::Unit>(),
-             "Initialize a CheapRuler object with a given latitude and unit.",
-             "latitude"_a, py::kw_only(), "unit"_a = CheapRuler::Unit::Meters)
+             "latitude"_a, py::kw_only(), "unit"_a = CheapRuler::Unit::Meters,
+             "Initialize a CheapRuler object with a given latitude and unit.")
         //
         .def_static("_fromTile", &CheapRuler::fromTile,
-                    "Create a CheapRuler from tile coordinates (x, y).",
-                    "x"_a, "y"_a)
+                    "x"_a, "y"_a,
+                    "Create a CheapRuler from tile coordinates (x, y).")
         .def("delta", &CheapRuler::delta,
-             "Calculate the distance between two points in the x, y plane.",
-             "lla0"_a, "lla1"_a)
+             "lla0"_a, "lla1"_a,
+             "Calculate the distance between two points in the x, y plane.")
         .def("squareDistance", &CheapRuler::squareDistance,
-             "Calculate the squared distance between two points.",
-             "a"_a, "b"_a)
+             "a"_a, "b"_a,
+             "Calculate the squared distance between two points.")
         .def("distance", &CheapRuler::distance,
-             "Calculate the distance between two points.",
-             "a"_a, "b"_a)
+             "a"_a, "b"_a,
+             "Calculate the distance between two points.")
         .def("bearing", &CheapRuler::bearing,
-             "Calculate the bearing between two points.",
-             "a"_a, "b"_a)
+             "a"_a, "b"_a,
+             "Calculate the bearing between two points.")
         .def("destination", &CheapRuler::destination,
-             "Calculate the destination point given origin, distance, and bearing.",
-             "origin"_a, "dist"_a, "bearing"_a)
+             "origin"_a, "dist"_a, "bearing"_a,
+             "Calculate the destination point given origin, distance, and bearing.")
         .def("offset", &CheapRuler::offset,
-             "Calculate a new point given origin and offsets.",
-             "origin"_a, "dx"_a, "dy"_a, "dz"_a = 0.0)
+             "origin"_a, "dx"_a, "dy"_a, "dz"_a = 0.0,
+             "Calculate a new point given origin and offsets.")
         .def("lineDistance", &CheapRuler::lineDistance,
-             "Calculate the total distance of a line (an array of points).",
-             "points"_a)
+             "points"_a,
+             "Calculate the total distance of a line (an array of points).")
         .def("area", &CheapRuler::area,
-             "Calculate the area of a polygon.",
-             "ring"_a)
+             "ring"_a,
+             "Calculate the area of a polygon.")
         .def("along", &CheapRuler::along,
-             "Calculate a point at a specified distance along the line.",
-             "line"_a, "dist"_a)
+             "line"_a, "dist"_a,
+             "Calculate a point at a specified distance along the line.")
         .def("pointToSegmentDistance", &CheapRuler::pointToSegmentDistance,
-             "Calculate the distance from a point to a line segment.",
-             "p"_a, "a"_a, "b"_a)
+             "p"_a, "a"_a, "b"_a,
+             "Calculate the distance from a point to a line segment.")
         .def("pointOnLine", &CheapRuler::pointOnLine,
-             "Calculate the closest point on a line to the given point.",
-             "line"_a, "p"_a)
+             "line"_a, "p"_a,
+             "Calculate the closest point on a line to the given point.")
         .def("lineSlice", &CheapRuler::lineSlice,
-             "Get a part of the line between the start and stop points.",
-             "start"_a, "stop"_a, "line"_a)
+             "start"_a, "stop"_a, "line"_a,
+             "Get a part of the line between the start and stop points.")
         .def("lineSliceAlong", &CheapRuler::lineSliceAlong,
-             "Get a part of the line between the start and stop distances along the line.",
-             "start"_a, "stop"_a, "line"_a)
+             "start"_a, "stop"_a, "line"_a,
+             "Get a part of the line between the start and stop distances along the line.")
         .def("bufferPoint", &CheapRuler::bufferPoint,
-             "Create a bounding box around a point.",
-             "p"_a, "buffer"_a)
+             "p"_a, "buffer"_a,
+             "Create a bounding box around a point.")
         .def("bufferBBox", &CheapRuler::bufferBBox,
-             "Create a bounding box around another bounding box.",
-             "bbox"_a, "buffer"_a)
+             "bbox"_a, "buffer"_a,
+             "Create a bounding box around another bounding box.")
         .def_static("_insideBBox", &CheapRuler::insideBBox,
-                    "Check if a point is inside a bounding box.",
-                    "p"_a, "bbox"_a, py::kw_only(), "cheak_z"_a = false)
+                    "p"_a, "bbox"_a, py::kw_only(), "cheak_z"_a = false,
+                    "Check if a point is inside a bounding box.")
         .def_static("_interpolate", &CheapRuler::interpolate,
-                    "Interpolate linearly between two points.",
-                    "a"_a, "b"_a, "t"_a)
+                    "a"_a, "b"_a, "t"_a,
+                    "Interpolate linearly between two points.")
         .def_static("_longDiff", &CheapRuler::longDiff,
-                    "Calculate the difference between two longitudes.",
-                    "a"_a, "b"_a);
+                    "a"_a, "b"_a,
+                    "Calculate the difference between two longitudes.");
 }
 } // namespace cubao
