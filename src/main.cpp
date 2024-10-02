@@ -36,7 +36,7 @@ namespace py = pybind11;
 using rvp = py::return_value_policy;
 using namespace pybind11::literals;
 
-PYBIND11_MODULE(polyline_ruler, m)
+PYBIND11_MODULE(_core, m)
 {
     m.doc() = R"pbdoc(
         cubao/polyline-ruler is more than mapbox/cheap-ruler

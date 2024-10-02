@@ -59,7 +59,7 @@ pytest:
 
 restub:
 	pybind11-stubgen polyline_ruler._core -o stubs
-	cp stubs/polyline_ruler/_core.pyi src/polyline_ruler
+	cp -rf stubs/polyline_ruler/_core src/polyline_ruler
 
 # conda create -y -n py38 python=3.8
 # conda create -y -n py39 python=3.9
