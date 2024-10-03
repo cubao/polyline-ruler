@@ -12,9 +12,9 @@ from polyline_ruler import (
     douglas_simplify_indexes,
     douglas_simplify_mask,
     intersect_segments,
+    snap_onto_2d,
     tf,
 )
-from polyline_ruler.tf import cheap_ruler_k
 
 
 def test_segment():
@@ -267,6 +267,8 @@ def test_intersections_duplicates():
 
 
 def test_cheap_ruler_k():
+    from polyline_ruler.tf import cheap_ruler_k
+
     k = cheap_ruler_k(50.0)
     eps = np.abs(k - [71695.753616003, 111229.06398856241, 1.0]).sum()
     assert eps < 1e-15
@@ -440,4 +442,8 @@ def test_cheap_ruler():
     assert dist == ruler.k()[1]
 
 
-print()
+def test_snap_onto():
+    P, dist, t = snap_onto_2d([13, 4], [0, 0], [10, 0])
+    assert P.tolist() == [10, 0]
+    assert dist == 5.0
+    assert t == 1.0
