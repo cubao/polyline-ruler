@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import time
 
 import numpy as np
+
 from polyline_ruler import (
     CheapRuler,
     LineSegment,
@@ -9,16 +12,16 @@ from polyline_ruler import (
     douglas_simplify_indexes,
     douglas_simplify_mask,
     intersect_segments,
+    snap_onto_2d,
     tf,
 )
-from polyline_ruler.tf import cheap_ruler_k
 
 
 def test_segment():
     seg = LineSegment([0, 0, 0], [10, 0, 0])
-    assert 4.0 == seg.distance([5.0, 4.0, 0.0])
-    assert 5.0 == seg.distance([-4.0, 3.0, 0.0])
-    assert 5.0 == seg.distance([14.0, 3.0, 0.0])
+    assert seg.distance([5.0, 4.0, 0.0]) == 4.0
+    assert seg.distance([-4.0, 3.0, 0.0]) == 5.0
+    assert seg.distance([14.0, 3.0, 0.0]) == 5.0
 
     assert np.all(seg.A == [0, 0, 0])
     assert np.all(seg.B == [10, 0, 0])
@@ -27,9 +30,9 @@ def test_segment():
     assert seg.length2 == 100.0
 
     seg = LineSegment([0, 0, 0], [0, 0, 0])
-    assert 5.0 == seg.distance([3.0, 4.0, 0.0])
-    assert 5.0 == seg.distance([-4.0, 3.0, 0.0])
-    assert 13.0 == seg.distance([5.0, 12.0, 0.0])
+    assert seg.distance([3.0, 4.0, 0.0]) == 5.0
+    assert seg.distance([-4.0, 3.0, 0.0]) == 5.0
+    assert seg.distance([5.0, 12.0, 0.0]) == 13.0
 
 
 def test_transform():
@@ -264,7 +267,7 @@ def test_intersections_duplicates():
 
 
 def test_cheap_ruler_k():
-    k = cheap_ruler_k(50.0)
+    k = tf.cheap_ruler_k(50.0)
     eps = np.abs(k - [71695.753616003, 111229.06398856241, 1.0]).sum()
     assert eps < 1e-15
 
@@ -435,3 +438,10 @@ def test_cheap_ruler():
         ]
     )
     assert dist == ruler.k()[1]
+
+
+def test_snap_onto():
+    P, dist, t = snap_onto_2d([13, 4], [0, 0], [10, 0])
+    assert P.tolist() == [10, 0]
+    assert dist == 5.0
+    assert t == 1.0

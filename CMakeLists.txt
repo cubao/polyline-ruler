@@ -1,11 +1,22 @@
-cmake_minimum_required(VERSION 3.4...3.18)
-project(polyline_ruler)
+cmake_minimum_required(VERSION 3.15...3.26)
+if(NOT DEFINED SKBUILD_PROJECT_NAME)
+  set(SKBUILD_PROJECT_NAME "polyline_ruler")
+endif()
+if(NOT DEFINED PROJECT_VERSION)
+  set(PROJECT_VERSION "dev")
+endif()
+# https://scikit-build-core.readthedocs.io/en/latest/cmakelists.html#accessing-information
+project(
+  ${SKBUILD_PROJECT_NAME}
+  VERSION ${SKBUILD_PROJECT_VERSION}
+  LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CXX_STANDARD 17)
 
 # set(CMAKE_BUILD_TYPE Debug)
-
 if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
   set(CMAKE_BUILD_TYPE
       "Release"
@@ -22,15 +33,17 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR}/headers/include)
-
-set(CMAKE_CXX_STANDARD 17)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/headers/include)
 set(PYBIND11_CPP_STANDARD -std=c++17)
 
-add_subdirectory(pybind11)
-pybind11_add_module(polyline_ruler src/main.cpp)
+# https://scikit-build-core.readthedocs.io/en/latest/getting_started.html
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+find_package(pybind11 CONFIG REQUIRED)
+include_directories(headers/include)
 
-# EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
-# define (VERSION_INFO) here.
-target_compile_definitions(polyline_ruler
-                           PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+file(GLOB SRCS src/main.cpp)
+python_add_library(_core MODULE ${SRCS} WITH_SOABI)
+target_link_libraries(_core PRIVATE pybind11::headers)
+target_include_directories(_core PRIVATE src)
+target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
+install(TARGETS _core DESTINATION ${PROJECT_NAME})
