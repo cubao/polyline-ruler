@@ -25,6 +25,9 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
 {
     m
         //
+        .def("snap_onto_2d",
+             &snap_onto_2d, //
+             "P"_a, "A"_a, "B"_a, "Snap P onto line segment AB")
         .def(
             "intersect_segments",
             py::overload_cast<const Eigen::Vector2d &, const Eigen::Vector2d &,
