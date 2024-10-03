@@ -267,9 +267,7 @@ def test_intersections_duplicates():
 
 
 def test_cheap_ruler_k():
-    from polyline_ruler.tf import cheap_ruler_k
-
-    k = cheap_ruler_k(50.0)
+    k = tf.cheap_ruler_k(50.0)
     eps = np.abs(k - [71695.753616003, 111229.06398856241, 1.0]).sum()
     assert eps < 1e-15
 
