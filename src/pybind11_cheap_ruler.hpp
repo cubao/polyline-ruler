@@ -23,22 +23,32 @@ using rvp = py::return_value_policy;
 
 CUBAO_INLINE void bind_cheap_ruler(py::module &m)
 {
-    py::class_<CheapRuler> cheap_ruler(m, "CheapRuler", py::module_local());
+    py::class_<CheapRuler> cheap_ruler(m, "CheapRuler", py::module_local(),
+                                       R"docstring(
+        A class for fast distance calculations and geometric operations.
 
-    py::enum_<CheapRuler::Unit>(cheap_ruler, "Unit")
-        .value("Kilometers", CheapRuler::Unit::Kilometers)
-        .value("Miles", CheapRuler::Unit::Miles)
-        .value("NauticalMiles", CheapRuler::Unit::NauticalMiles)
-        .value("Meters", CheapRuler::Unit::Meters)
-        .value("Metres", CheapRuler::Unit::Metres)
-        .value("Yards", CheapRuler::Unit::Yards)
-        .value("Feet", CheapRuler::Unit::Feet)
-        .value("Inches", CheapRuler::Unit::Inches)
+        CheapRuler provides methods for various geometric calculations
+        optimized for speed and simplicity, sacrificing some accuracy
+        for performance.
+        )docstring");
+
+    py::enum_<CheapRuler::Unit>(cheap_ruler, "Unit",
+                                R"docstring(
+        Enumeration of supported distance units.
+        )docstring")
+        .value("Kilometers", CheapRuler::Unit::Kilometers, "Kilometers")
+        .value("Miles", CheapRuler::Unit::Miles, "Miles")
+        .value("NauticalMiles", CheapRuler::Unit::NauticalMiles,
+               "Nautical Miles")
+        .value("Meters", CheapRuler::Unit::Meters, "Meters")
+        .value("Metres", CheapRuler::Unit::Metres, "Metres (alias for Meters)")
+        .value("Yards", CheapRuler::Unit::Yards, "Yards")
+        .value("Feet", CheapRuler::Unit::Feet, "Feet")
+        .value("Inches", CheapRuler::Unit::Inches, "Inches")
         .export_values();
 
     cheap_ruler //
-        .def("k", py::overload_cast<>(&CheapRuler::k, py::const_), "latitude"_a,
-             py::kw_only(), "unit"_a = CheapRuler::Unit::Meters,
+        .def("k", py::overload_cast<>(&CheapRuler::k, py::const_),
              "Get the ruler's unit conversion factor.")
         .def_static(
             "_k", py::overload_cast<double, CheapRuler::Unit>(&CheapRuler::k),
