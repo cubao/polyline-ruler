@@ -319,4 +319,5 @@ CUBAO_INLINE void bind_polyline_ruler(py::module &m)
         "recursive"_a = true,
         "Get indexes of points to keep when simplifying a 2D polyline using "
         "the Douglas-Peucker algorithm.");
+}
 } // namespace cubao
