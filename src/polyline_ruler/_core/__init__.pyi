@@ -25,29 +25,43 @@ __all__ = [
     "douglas_simplify_indexes",
     "douglas_simplify_mask",
     "intersect_segments",
+    "snap_onto_2d",
     "tf",
 ]
 
 class CheapRuler:
+    """
+
+    A class for fast distance calculations and geometric operations.
+
+    CheapRuler provides methods for various geometric calculations
+    optimized for speed and simplicity, sacrificing some accuracy
+    for performance.
+
+    """
     class Unit:
         """
+
+                Enumeration of supported distance units.
+
+
         Members:
 
-          Kilometers
+          Kilometers : Kilometers
 
-          Miles
+          Miles : Miles
 
-          NauticalMiles
+          NauticalMiles : Nautical Miles
 
-          Meters
+          Meters : Meters
 
-          Metres
+          Metres : Metres (alias for Meters)
 
-          Yards
+          Yards : Yards
 
-          Feet
+          Feet : Feet
 
-          Inches
+          Inches : Inches
         """
 
         Feet: typing.ClassVar[CheapRuler.Unit]  # value = <Unit.Feet: 5>
@@ -91,7 +105,10 @@ class CheapRuler:
     RE: typing.ClassVar[float] = 6378.137
     Yards: typing.ClassVar[CheapRuler.Unit]  # value = <Unit.Yards: 4>
     @staticmethod
-    def _fromTile(x: int, y: int) -> CheapRuler: ...
+    def _fromTile(x: int, y: int) -> CheapRuler:
+        """
+        Create a CheapRuler from tile coordinates (x, y).
+        """
     @staticmethod
     def _insideBBox(
         p: numpy.ndarray[numpy.float64[3, 1]],
@@ -100,71 +117,115 @@ class CheapRuler:
         ],
         *,
         cheak_z: bool = False,
-    ) -> bool: ...
+    ) -> bool:
+        """
+        Check if a point is inside a bounding box.
+        """
     @staticmethod
     def _interpolate(
         a: numpy.ndarray[numpy.float64[3, 1]],
         b: numpy.ndarray[numpy.float64[3, 1]],
         t: float,
-    ) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    ) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Interpolate linearly between two points.
+        """
     @staticmethod
     def _k(
         latitude: float, *, unit: CheapRuler.Unit = ...
-    ) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    ) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the unit conversion factor for a given latitude and unit.
+        """
     @staticmethod
-    def _longDiff(a: float, b: float) -> float: ...
-    def __init__(self, latitude: float, *, unit: CheapRuler.Unit = ...) -> None: ...
+    def _longDiff(a: float, b: float) -> float:
+        """
+        Calculate the difference between two longitudes.
+        """
+    def __init__(self, latitude: float, *, unit: CheapRuler.Unit = ...) -> None:
+        """
+        Initialize a CheapRuler object with a given latitude and unit.
+        """
     def along(
         self,
         line: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
         dist: float,
-    ) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    ) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Calculate a point at a specified distance along the line.
+        """
     def area(
         self, ring: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous]
-    ) -> float: ...
+    ) -> float:
+        """
+        Calculate the area of a polygon.
+        """
     def bearing(
         self,
         a: numpy.ndarray[numpy.float64[3, 1]],
         b: numpy.ndarray[numpy.float64[3, 1]],
-    ) -> float: ...
+    ) -> float:
+        """
+        Calculate the bearing between two points.
+        """
     def bufferBBox(
         self,
         bbox: tuple[
             numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]
         ],
         buffer: float,
-    ) -> tuple[
-        numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]
-    ]: ...
+    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]]:
+        """
+        Create a bounding box around another bounding box.
+        """
     def bufferPoint(
         self, p: numpy.ndarray[numpy.float64[3, 1]], buffer: float
-    ) -> tuple[
-        numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]
-    ]: ...
+    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]]:
+        """
+        Create a bounding box around a point.
+        """
     def delta(
         self,
         lla0: numpy.ndarray[numpy.float64[3, 1]],
         lla1: numpy.ndarray[numpy.float64[3, 1]],
-    ) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    ) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Calculate the distance between two points in the x, y plane.
+        """
     def destination(
         self, origin: numpy.ndarray[numpy.float64[3, 1]], dist: float, bearing: float
-    ) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    ) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Calculate the destination point given origin, distance, and bearing.
+        """
     def distance(
         self,
         a: numpy.ndarray[numpy.float64[3, 1]],
         b: numpy.ndarray[numpy.float64[3, 1]],
-    ) -> float: ...
-    def k(self) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    ) -> float:
+        """
+        Calculate the distance between two points.
+        """
+    def k(self) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the ruler's unit conversion factor.
+        """
     def lineDistance(
         self,
         points: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
-    ) -> float: ...
+    ) -> float:
+        """
+        Calculate the total distance of a line (an array of points).
+        """
     def lineSlice(
         self,
         start: numpy.ndarray[numpy.float64[3, 1]],
         stop: numpy.ndarray[numpy.float64[3, 1]],
         line: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
-    ) -> numpy.ndarray[numpy.float64[m, 3]]: ...
+    ) -> numpy.ndarray[numpy.float64[m, 3]]:
+        """
+        Get a part of the line between the start and stop points.
+        """
     def lineSliceAlong(
         self,
         start: float,
@@ -174,52 +235,94 @@ class CheapRuler:
             numpy.ndarray.flags.writeable,
             numpy.ndarray.flags.c_contiguous,
         ],
-    ) -> numpy.ndarray[numpy.float64[m, 3]]: ...
+    ) -> numpy.ndarray[numpy.float64[m, 3]]:
+        """
+        Get a part of the line between the start and stop distances along the line.
+        """
     def offset(
         self,
         origin: numpy.ndarray[numpy.float64[3, 1]],
         dx: float,
         dy: float,
         dz: float = 0.0,
-    ) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    ) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Calculate a new point given origin and offsets.
+        """
     def pointOnLine(
         self,
         line: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
         p: numpy.ndarray[numpy.float64[3, 1]],
-    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], int, float]: ...
+    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], int, float]:
+        """
+        Calculate the closest point on a line to the given point.
+        """
     def pointToSegmentDistance(
         self,
         p: numpy.ndarray[numpy.float64[3, 1]],
         a: numpy.ndarray[numpy.float64[3, 1]],
         b: numpy.ndarray[numpy.float64[3, 1]],
-    ) -> float: ...
+    ) -> float:
+        """
+        Calculate the distance from a point to a line segment.
+        """
     def squareDistance(
         self,
         a: numpy.ndarray[numpy.float64[3, 1]],
         b: numpy.ndarray[numpy.float64[3, 1]],
-    ) -> float: ...
+    ) -> float:
+        """
+        Calculate the squared distance between two points.
+        """
 
 class LineSegment:
     def __init__(
         self,
         A: numpy.ndarray[numpy.float64[3, 1]],
         B: numpy.ndarray[numpy.float64[3, 1]],
-    ) -> None: ...
-    def distance(self, P: numpy.ndarray[numpy.float64[3, 1]]) -> float: ...
-    def distance2(self, P: numpy.ndarray[numpy.float64[3, 1]]) -> float: ...
+    ) -> None:
+        """
+        Initialize a LineSegment with two 3D points.
+        """
+    def distance(self, P: numpy.ndarray[numpy.float64[3, 1]]) -> float:
+        """
+        Calculate the distance from a point to the line segment.
+        """
+    def distance2(self, P: numpy.ndarray[numpy.float64[3, 1]]) -> float:
+        """
+        Calculate the squared distance from a point to the line segment.
+        """
     def intersects(
         self, other: LineSegment
-    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], float, float, float] | None: ...
+    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], float, float, float] | None:
+        """
+        Check if this line segment intersects with another.
+        """
     @property
-    def A(self) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    def A(self) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the start point of the line segment.
+        """
     @property
-    def AB(self) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    def AB(self) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the vector from A to B.
+        """
     @property
-    def B(self) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    def B(self) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the end point of the line segment.
+        """
     @property
-    def length(self) -> float: ...
+    def length(self) -> float:
+        """
+        Get the length of the line segment.
+        """
     @property
-    def length2(self) -> float: ...
+    def length2(self) -> float:
+        """
+        Get the squared length of the line segment.
+        """
 
 class PolylineRuler:
     @staticmethod
@@ -228,33 +331,48 @@ class PolylineRuler:
         dist: float,
         *,
         is_wgs84: bool = False,
-    ) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    ) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Find a point at a specified distance along a polyline.
+        """
     @staticmethod
     def _dirs(
         polyline: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
         *,
         is_wgs84: bool = False,
-    ) -> numpy.ndarray[numpy.float64[m, 3]]: ...
+    ) -> numpy.ndarray[numpy.float64[m, 3]]:
+        """
+        Calculate direction vectors for each segment of a polyline.
+        """
     @staticmethod
     def _distance(
         a: numpy.ndarray[numpy.float64[3, 1]],
         b: numpy.ndarray[numpy.float64[3, 1]],
         *,
         is_wgs84: bool = False,
-    ) -> float: ...
+    ) -> float:
+        """
+        Calculate the distance between two points.
+        """
     @staticmethod
     def _interpolate(
         A: numpy.ndarray[numpy.float64[3, 1]],
         B: numpy.ndarray[numpy.float64[3, 1]],
         *,
         t: float,
-    ) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    ) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Interpolate between two points.
+        """
     @staticmethod
     def _lineDistance(
         line: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
         *,
         is_wgs84: bool = False,
-    ) -> float: ...
+    ) -> float:
+        """
+        Calculate the total length of a polyline.
+        """
     @staticmethod
     def _lineSlice(
         start: numpy.ndarray[numpy.float64[3, 1]],
@@ -262,7 +380,10 @@ class PolylineRuler:
         line: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
         *,
         is_wgs84: bool = False,
-    ) -> numpy.ndarray[numpy.float64[m, 3]]: ...
+    ) -> numpy.ndarray[numpy.float64[m, 3]]:
+        """
+        Extract a portion of a polyline between two points.
+        """
     @staticmethod
     def _lineSliceAlong(
         start: float,
@@ -270,14 +391,20 @@ class PolylineRuler:
         line: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
         *,
         is_wgs84: bool = False,
-    ) -> numpy.ndarray[numpy.float64[m, 3]]: ...
+    ) -> numpy.ndarray[numpy.float64[m, 3]]:
+        """
+        Extract a portion of a polyline between two distances along it.
+        """
     @staticmethod
     def _pointOnLine(
         line: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
         P: numpy.ndarray[numpy.float64[3, 1]],
         *,
         is_wgs84: bool = False,
-    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], int, float]: ...
+    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], int, float]:
+        """
+        Find the closest point on a polyline to a given point.
+        """
     @staticmethod
     def _pointToSegmentDistance(
         P: numpy.ndarray[numpy.float64[3, 1]],
@@ -285,40 +412,60 @@ class PolylineRuler:
         B: numpy.ndarray[numpy.float64[3, 1]],
         *,
         is_wgs84: bool = False,
-    ) -> float: ...
+    ) -> float:
+        """
+        Calculate the distance from a point to a line segment.
+        """
     @staticmethod
     def _ranges(
         polyline: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
         *,
         is_wgs84: bool = False,
-    ) -> numpy.ndarray[numpy.float64[m, 1]]: ...
+    ) -> numpy.ndarray[numpy.float64[m, 1]]:
+        """
+        Calculate cumulative distances along a polyline.
+        """
     @staticmethod
     def _squareDistance(
         a: numpy.ndarray[numpy.float64[3, 1]],
         b: numpy.ndarray[numpy.float64[3, 1]],
         *,
         is_wgs84: bool = False,
-    ) -> float: ...
-    def N(self) -> int: ...
+    ) -> float:
+        """
+        Calculate the squared distance between two points.
+        """
+    def N(self) -> int:
+        """
+        Get the number of points in the polyline.
+        """
     def __init__(
         self,
         coords: numpy.ndarray[numpy.float64[m, 3], numpy.ndarray.flags.c_contiguous],
         *,
         is_wgs84: bool = False,
-    ) -> None: ...
-    def along(self, dist: float) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    ) -> None:
+        """
+        Initialize a PolylineRuler with coordinates and coordinate system.
+        """
+    def along(self, dist: float) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Find a point at a specified distance along the polyline.
+        """
     @typing.overload
     def arrow(
         self, *, index: int, t: float
-    ) -> tuple[
-        numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]
-    ]: ...
+    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]]:
+        """
+        Get the arrow (point and direction) at a specific segment index and interpolation factor.
+        """
     @typing.overload
     def arrow(
         self, range: float, *, smooth_joint: bool = True
-    ) -> tuple[
-        numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]
-    ]: ...
+    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]]:
+        """
+        Get the arrow (point and direction) at a specific cumulative distance.
+        """
     @typing.overload
     def arrows(
         self, ranges: numpy.ndarray[numpy.float64[m, 1]], *, smooth_joint: bool = True
@@ -326,7 +473,10 @@ class PolylineRuler:
         numpy.ndarray[numpy.float64[m, 1]],
         numpy.ndarray[numpy.float64[m, 3]],
         numpy.ndarray[numpy.float64[m, 3]],
-    ]: ...
+    ]:
+        """
+        Get arrows (points and directions) at multiple cumulative distances.
+        """
     @typing.overload
     def arrows(
         self, step: float, *, with_last: bool = True, smooth_joint: bool = True
@@ -334,54 +484,119 @@ class PolylineRuler:
         numpy.ndarray[numpy.float64[m, 1]],
         numpy.ndarray[numpy.float64[m, 3]],
         numpy.ndarray[numpy.float64[m, 3]],
-    ]: ...
+    ]:
+        """
+        Get arrows (points and directions) at regular intervals along the polyline.
+        """
     @typing.overload
-    def at(self, *, range: float) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    def at(self, *, range: float) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the point on the polyline at a specific cumulative distance.
+        """
     @typing.overload
-    def at(self, *, segment_index: int) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    def at(self, *, segment_index: int) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the point on the polyline at a specific segment index.
+        """
     @typing.overload
-    def at(
-        self, *, segment_index: int, t: float
-    ) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    def at(self, *, segment_index: int, t: float) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the point on the polyline at a specific segment index and interpolation factor.
+        """
     @typing.overload
-    def dir(self, *, point_index: int) -> numpy.ndarray[numpy.float64[3, 1]]: ...
+    def dir(self, *, point_index: int) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the direction vector at a specific point index.
+        """
     @typing.overload
     def dir(
         self, *, range: float, smooth_joint: bool = True
-    ) -> numpy.ndarray[numpy.float64[3, 1]]: ...
-    def dirs(self) -> numpy.ndarray[numpy.float64[m, 3]]: ...
-    def extended_along(self, range: float) -> numpy.ndarray[numpy.float64[3, 1]]: ...
-    def is_wgs84(self) -> bool: ...
-    def k(self) -> numpy.ndarray[numpy.float64[3, 1]]: ...
-    def length(self) -> float: ...
-    def lineDistance(self) -> float: ...
+    ) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the direction vector at a specific cumulative distance.
+        """
+    def dirs(self) -> numpy.ndarray[numpy.float64[m, 3]]:
+        """
+        Get direction vectors for each segment of the polyline.
+        """
+    def extended_along(self, range: float) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the extended cumulative distance along the polyline.
+        """
+    def is_wgs84(self) -> bool:
+        """
+        Check if the coordinate system is WGS84.
+        """
+    def k(self) -> numpy.ndarray[numpy.float64[3, 1]]:
+        """
+        Get the scale factor for distance calculations.
+        """
+    def length(self) -> float:
+        """
+        Get the total length of the polyline.
+        """
+    def lineDistance(self) -> float:
+        """
+        Get the total length of the polyline.
+        """
     def lineSlice(
         self,
         start: numpy.ndarray[numpy.float64[3, 1]],
         stop: numpy.ndarray[numpy.float64[3, 1]],
-    ) -> numpy.ndarray[numpy.float64[m, 3]]: ...
+    ) -> numpy.ndarray[numpy.float64[m, 3]]:
+        """
+        Extract a portion of the polyline between two points.
+        """
     def lineSliceAlong(
         self, start: float, stop: float
-    ) -> numpy.ndarray[numpy.float64[m, 3]]: ...
+    ) -> numpy.ndarray[numpy.float64[m, 3]]:
+        """
+        Extract a portion of the polyline between two distances along it.
+        """
     def local_frame(
         self, range: float, *, smooth_joint: bool = True
-    ) -> numpy.ndarray[numpy.float64[4, 4]]: ...
+    ) -> numpy.ndarray[numpy.float64[4, 4]]:
+        """
+        Get the local coordinate frame at a specific cumulative distance.
+        """
     def pointOnLine(
         self, P: numpy.ndarray[numpy.float64[3, 1]]
-    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], int, float]: ...
-    def polyline(self) -> numpy.ndarray[numpy.float64[m, 3]]: ...
+    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], int, float]:
+        """
+        Find the closest point on the polyline to a given point.
+        """
+    def polyline(self) -> numpy.ndarray[numpy.float64[m, 3]]:
+        """
+        Get the polyline coordinates.
+        """
     @typing.overload
-    def range(self, segment_index: int) -> float: ...
+    def range(self, segment_index: int) -> float:
+        """
+        Get the cumulative distance at a specific segment index.
+        """
     @typing.overload
-    def range(self, *, segment_index: int, t: float) -> float: ...
-    def ranges(self) -> numpy.ndarray[numpy.float64[m, 1]]: ...
+    def range(self, *, segment_index: int, t: float) -> float:
+        """
+        Get the cumulative distance at a specific segment index and interpolation factor.
+        """
+    def ranges(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+        """
+        Get cumulative distances along the polyline.
+        """
     def scanline(
         self, range: float, *, min: float, max: float, smooth_joint: bool = True
-    ) -> tuple[
-        numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]
-    ]: ...
-    def segment_index(self, range: float) -> int: ...
-    def segment_index_t(self, range: float) -> tuple[int, float]: ...
+    ) -> tuple[numpy.ndarray[numpy.float64[3, 1]], numpy.ndarray[numpy.float64[3, 1]]]:
+        """
+        Generate a scanline perpendicular to the polyline at a specific cumulative distance.
+        """
+    def segment_index(self, range: float) -> int:
+        """
+        Get the segment index for a given cumulative distance.
+        """
+    def segment_index_t(self, range: float) -> tuple[int, float]:
+        """
+        Get the segment index and interpolation factor for a given cumulative distance.
+        """
 
 @typing.overload
 def douglas_simplify(
@@ -390,7 +605,11 @@ def douglas_simplify(
     *,
     is_wgs84: bool = False,
     recursive: bool = True,
-) -> numpy.ndarray[numpy.float64[m, 3]]: ...
+) -> numpy.ndarray[numpy.float64[m, 3]]:
+    """
+    Simplify a polyline using the Douglas-Peucker algorithm.
+    """
+
 @typing.overload
 def douglas_simplify(
     coords: numpy.ndarray[numpy.float64[m, 2], numpy.ndarray.flags.c_contiguous],
@@ -398,7 +617,11 @@ def douglas_simplify(
     *,
     is_wgs84: bool = False,
     recursive: bool = True,
-) -> numpy.ndarray[numpy.float64[m, 2]]: ...
+) -> numpy.ndarray[numpy.float64[m, 2]]:
+    """
+    Simplify a 2D polyline using the Douglas-Peucker algorithm.
+    """
+
 @typing.overload
 def douglas_simplify_indexes(
     coords: numpy.ndarray[numpy.float64[m, 3]],
@@ -406,7 +629,11 @@ def douglas_simplify_indexes(
     *,
     is_wgs84: bool = False,
     recursive: bool = True,
-) -> numpy.ndarray[numpy.int32[m, 1]]: ...
+) -> numpy.ndarray[numpy.int32[m, 1]]:
+    """
+    Get indexes of points to keep when simplifying a polyline using the Douglas-Peucker algorithm.
+    """
+
 @typing.overload
 def douglas_simplify_indexes(
     coords: numpy.ndarray[numpy.float64[m, 2], numpy.ndarray.flags.c_contiguous],
@@ -414,7 +641,11 @@ def douglas_simplify_indexes(
     *,
     is_wgs84: bool = False,
     recursive: bool = True,
-) -> numpy.ndarray[numpy.int32[m, 1]]: ...
+) -> numpy.ndarray[numpy.int32[m, 1]]:
+    """
+    Get indexes of points to keep when simplifying a 2D polyline using the Douglas-Peucker algorithm.
+    """
+
 @typing.overload
 def douglas_simplify_mask(
     coords: numpy.ndarray[numpy.float64[m, 3]],
@@ -422,7 +653,11 @@ def douglas_simplify_mask(
     *,
     is_wgs84: bool = False,
     recursive: bool = True,
-) -> numpy.ndarray[numpy.int32[m, 1]]: ...
+) -> numpy.ndarray[numpy.int32[m, 1]]:
+    """
+    Get a mask of points to keep when simplifying a polyline using the Douglas-Peucker algorithm.
+    """
+
 @typing.overload
 def douglas_simplify_mask(
     coords: numpy.ndarray[numpy.float64[m, 2], numpy.ndarray.flags.c_contiguous],
@@ -430,20 +665,40 @@ def douglas_simplify_mask(
     *,
     is_wgs84: bool = False,
     recursive: bool = True,
-) -> numpy.ndarray[numpy.int32[m, 1]]: ...
+) -> numpy.ndarray[numpy.int32[m, 1]]:
+    """
+    Get a mask of points to keep when simplifying a 2D polyline using the Douglas-Peucker algorithm.
+    """
+
 @typing.overload
 def intersect_segments(
     a1: numpy.ndarray[numpy.float64[2, 1]],
     a2: numpy.ndarray[numpy.float64[2, 1]],
     b1: numpy.ndarray[numpy.float64[2, 1]],
     b2: numpy.ndarray[numpy.float64[2, 1]],
-) -> tuple[numpy.ndarray[numpy.float64[2, 1]], float, float] | None: ...
+) -> tuple[numpy.ndarray[numpy.float64[2, 1]], float, float] | None:
+    """
+    Intersect two 2D line segments.
+    """
+
 @typing.overload
 def intersect_segments(
     a1: numpy.ndarray[numpy.float64[3, 1]],
     a2: numpy.ndarray[numpy.float64[3, 1]],
     b1: numpy.ndarray[numpy.float64[3, 1]],
     b2: numpy.ndarray[numpy.float64[3, 1]],
-) -> tuple[numpy.ndarray[numpy.float64[3, 1]], float, float, float] | None: ...
+) -> tuple[numpy.ndarray[numpy.float64[3, 1]], float, float, float] | None:
+    """
+    Intersect two 3D line segments.
+    """
+
+def snap_onto_2d(
+    P: numpy.ndarray[numpy.float64[2, 1]],
+    A: numpy.ndarray[numpy.float64[2, 1]],
+    B: numpy.ndarray[numpy.float64[2, 1]],
+) -> tuple[numpy.ndarray[numpy.float64[2, 1]], float, float]:
+    """
+    Snap P onto line segment AB
+    """
 
 __version__: str = "0.0.5"

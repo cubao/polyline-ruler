@@ -3,6 +3,7 @@ from __future__ import annotations
 import time
 
 import numpy as np
+
 from polyline_ruler import (
     CheapRuler,
     LineSegment,
@@ -437,3 +438,6 @@ def test_cheap_ruler():
         ]
     )
     assert dist == ruler.k()[1]
+
+
+print()
