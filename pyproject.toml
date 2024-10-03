@@ -5,7 +5,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "polyline_ruler"
-version = "0.0.5"
+version = "0.0.6"
 url = "https://polyline-ruler.readthedocs.io"
 description="cubao/polyline-ruler is more than mapbox/cheap-ruler"
 readme = "README.md"
