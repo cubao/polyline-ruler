@@ -33,13 +33,18 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 endif()
 
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/headers/include)
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" -c
+          "import cubao_headers; print(cubao_headers.get_include())"
+  OUTPUT_VARIABLE CUBAO_HEADERS_INCLUDE_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+include_directories(SYSTEM ${CUBAO_HEADERS_INCLUDE_DIR})
 set(PYBIND11_CPP_STANDARD -std=c++17)
 
 # https://scikit-build-core.readthedocs.io/en/latest/getting_started.html
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG REQUIRED)
-include_directories(headers/include)
 
 file(GLOB SRCS src/main.cpp)
 python_add_library(_core MODULE ${SRCS} WITH_SOABI)
